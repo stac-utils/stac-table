@@ -1,0 +1,30 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "stac_table"
+authors = [{name = "Tom Augspurger", email = "taugspurger@microsoft.com"}]
+classifiers = ["License :: OSI Approved :: MIT License"]
+dynamic = ["version", "description"]
+dependencies = [
+    "pandas",
+    "pyarrow",
+    "pystac>=1.1.0",
+    # "pandas",
+    # "pyproj",
+    # "pydantic",
+    # "zarr",
+    # "jsonschema",
+    # "dask[array]",  # for chunking
+    # # these are just for generate
+    # "fsspec",
+    # "adlfs",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest >=2.7.3",
+    "pytest-cov",
+]
+doc = ["sphinx"]
