@@ -13,6 +13,27 @@ T = TypeVar("T", pystac.Collection, pystac.Item)
 
 
 def generate(ds: pyarrow.parquet.ParquetDataset, template) -> T:
+    """
+    Generate a STAC Item from a Parquet Dataset.
+
+    Parameters
+    ----------
+    ds : pyarrow.parquet.ParquetDataset
+        The input table, as a ParquetDataset. Make sure to use `use_legacy_dataset=False`.
+    template : pystac.Item
+        The template item. This will be cloned and new data will be filled in.
+
+    Returns
+    -------
+    pystac.Item
+        The updated pystac.Item with the following fields set
+
+        * stac_extensions : added `table` extension
+        * table:columns
+        * table:geo_arrow_metadata
+    """
+    # TODO: compute geometry / bbox from the geometry column
+    # TODO: update stac_extensions
     template = copy.deepcopy(template)
 
     columns = generate_columns(ds)
@@ -27,10 +48,7 @@ def generate(ds: pyarrow.parquet.ParquetDataset, template) -> T:
 def generate_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
     columns = []
     for field in ds.schema:
-        column = {
-            "name": field.name,
-            "metadata": field.metadata,
-        }
+        column = {"name": field.name, "metadata": field.metadata}
         columns.append(column)
     return columns
 
