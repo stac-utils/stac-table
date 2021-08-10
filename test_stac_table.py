@@ -5,12 +5,18 @@ import stac_table
 import shapely.geometry
 import pyarrow.parquet
 
-warnings.filterwarnings('ignore', message='.*initial implementation of Parquet.*')
-
 
 def test_generate_collection():
-    gdf = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-    gdf.to_parquet("data.parquet")
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="An exception was ignored")
+        gdf = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore", message=".*initial implementation of Parquet.*"
+        )
+        gdf.to_parquet("data.parquet")
+
     ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
 
     geometry = shapely.geometry.mapping(gdf.geometry.unary_union)
@@ -19,7 +25,7 @@ def test_generate_collection():
     item = pystac.Item("naturalearth_lowres", geometry, bbox, "2021-01-01", {})
     result = stac_table.generate(ds, item)
 
-    expected = [
+    expected_columns = [
         {"name": "pop_est", "metadata": None},
         {"name": "continent", "metadata": None},
         {"name": "name", "metadata": None},
@@ -27,9 +33,9 @@ def test_generate_collection():
         {"name": "gdp_md_est", "metadata": None},
         {"name": "geometry", "metadata": None},
     ]
-    assert result.properties["table:columns"] == expected
+    assert result.properties["table:columns"] == expected_columns
 
-    expected = {
+    expected_geo_arrow_metadata = {
         "primary_column": "geometry",
         "columns": {
             "geometry": {
@@ -41,4 +47,9 @@ def test_generate_collection():
         "schema_version": "0.1.0",
         "creator": {"library": "geopandas", "version": "0.9.0"},
     }
-    assert result.properties["table:geo_arrow_metadata"] == expected
+    assert result.properties["table:geo_arrow_metadata"] == expected_geo_arrow_metadata
+
+    # From a path
+    result = stac_table.generate("data.parquet", item)
+    assert result.properties["table:columns"] == expected_columns
+    assert result.properties["table:geo_arrow_metadata"] == expected_geo_arrow_metadata
