@@ -16,7 +16,10 @@ SCHEMA_URI = "https://stac-extensions.github.io/table/v1.0.0/schema.json"
 
 
 def generate(
-    ds: Union[str, pyarrow.parquet.ParquetDataset], template, storage_options=None
+    ds: Union[str, pyarrow.parquet.ParquetDataset],
+    template,
+    storage_options=None,
+    add_assets=True,
 ) -> T:
     """
     Generate a STAC Item from a Parquet Dataset.
@@ -32,6 +35,9 @@ def generate(
         ``use_legacy_dataset=False``.
     template : pystac.Item
         The template item. This will be cloned and new data will be filled in.
+    storage_options: mapping, optional
+        A dictionary of keywords to provide to :meth:`fsspec.get_fs_token_paths`
+        when creating an fsspec filesystem with a str ``ds``.
 
     Returns
     -------
