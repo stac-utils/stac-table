@@ -40,7 +40,7 @@ def generate(
     infer_datetime=InferDatetimeOptions.no,
     asset="data",
     storage_options=None,
-    geo_arrow_metadata=None,
+    geo_arrow_metadata=True,
 ) -> T:
     """
     Generate a STAC Item from a Parquet Dataset.
@@ -79,6 +79,8 @@ def generate(
         A dictionary of keywords to provide to :meth:`fsspec.get_fs_token_paths`
         when creating an fsspec filesystem with a str ``ds``.
 
+    geo_arrow_metadata : bool or dict
+
     Returns
     -------
     pystac.Item
@@ -105,11 +107,12 @@ def generate(
     #     )
 
     columns = get_columns(ds)
-    if geo_arrow_metadata is None:
-        geo_arrow_metadata = get_geo_arrow_metadata(ds)
-
     template.properties["table:columns"] = columns
-    template.properties["table:geo_arrow_metadata"] = geo_arrow_metadata
+
+    if geo_arrow_metadata is True:
+        template.properties["table:geo_arrow_metadata"] = get_geo_arrow_metadata(ds)
+    elif geo_arrow_metadata:
+        template.properties["table:geo_arrow_metadata"] = geo_arrow_metadata
 
     if SCHEMA_URI not in template.stac_extensions:
         template.stac_extensions.append(SCHEMA_URI)

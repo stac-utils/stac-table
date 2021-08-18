@@ -1,5 +1,5 @@
 """
-Generates a STAC item for GBIF, using the parquet files on Azure: http://aka.ms/ai4edata-gbif.
+Generates a STAC Collection and item for GBIF, using the parquet files on Azure: http://aka.ms/ai4edata-gbif.
 
 Requires `adlfs` and `lxml` in addition to the other packages.
 """
@@ -52,6 +52,26 @@ def main():
 
     for column in result.properties["table:columns"]:
         column["description"] = descriptions[column["name"]]
+
+    with open("item.json", "w") as f:
+        json.dump(result.to_dict(), f, indent=2)
+
+    collection = pystac.Collection(
+        "gbif",
+        description=(
+            "The [Global Biodiversity Information Facility](https://www.gbif.org/) (GBIF) is an international "
+            "network and data infrastructure funded by the world's governments providing global data that "
+            "document the occurrence of species."
+        ),
+        extent={
+            "spatial": [[-180, -90, 180, 90]],
+            "temporal": [["2021-08-01T00:00:00Z"]],
+        },
+    )
+    collection.extra_fields["table:columns"] = result.properties["table:columns"]
+    collection.extra_fields["table:geo_arrow_metadata"] = result.properties[
+        "table:geo_arrow_metadata"
+    ]
 
     with open("item.json", "w") as f:
         json.dump(result.to_dict(), f, indent=2)
