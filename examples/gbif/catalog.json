@@ -1,0 +1,257 @@
+{
+  "type": "Collection",
+  "id": "gbif",
+  "stac_version": "1.0.0",
+  "description": "The [Global Biodiversity Information Facility](https://www.gbif.org/) (GBIF) is an international network and data infrastructure funded by the world's governments providing global data that document the occurrence of species.",
+  "links": [
+    {
+      "rel": "root",
+      "href": null,
+      "type": "application/json"
+    }
+  ],
+  "stac_extensions": [],
+  "table:columns": [
+    {
+      "name": "gbifid",
+      "description": "GBIF's identifier for the occurrence"
+    },
+    {
+      "name": "datasetkey",
+      "description": "GBIF's UUID for the dataset containing this occurrence"
+    },
+    {
+      "name": "occurrenceid",
+      "description": "See dwc:occurrenceID."
+    },
+    {
+      "name": "kingdom",
+      "description": "See dwc:kingdom. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "phylum",
+      "description": "See dwc:phylum. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "class",
+      "description": "See dwc:class. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "order",
+      "description": "See dwc:order. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "family",
+      "description": "See dwc:family. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "genus",
+      "description": "See dwc:genus. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "species",
+      "description": "See dwc:species. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "infraspecificepithet",
+      "description": "See dwc:infraspecificEpithet. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "taxonrank",
+      "description": "See dwc:taxonRank. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "scientificname",
+      "description": "See dwc:scientificName. This field has been aligned with the GBIF backbone taxonomy."
+    },
+    {
+      "name": "verbatimscientificname",
+      "description": "The scientific name as provided by the data publisher"
+    },
+    {
+      "name": "verbatimscientificnameauthorship",
+      "description": "The scientific name authorship provided by the data publisher."
+    },
+    {
+      "name": "countrycode",
+      "description": "See dwc:countryCode. GBIF's interpretation has set this to an ISO 3166-2 code."
+    },
+    {
+      "name": "locality",
+      "description": "See dwc:locality."
+    },
+    {
+      "name": "stateprovince",
+      "description": "See dwc:stateProvince."
+    },
+    {
+      "name": "occurrencestatus",
+      "description": "See dwc:occurrenceStatus. Either the value PRESENT or ABSENT. Many users will wish to filter for PRESENT data."
+    },
+    {
+      "name": "individualcount",
+      "description": "See dwc:individualCount."
+    },
+    {
+      "name": "publishingorgkey",
+      "description": "GBIF's UUID for the organization publishing this occurrence."
+    },
+    {
+      "name": "decimallatitude",
+      "description": "See dwc:decimalLatitude. GBIF's interpretation has normalized this to a WGS84 coordinate."
+    },
+    {
+      "name": "decimallongitude",
+      "description": "See dwc:decimalLongitude. GBIF's interpretation has normalized this to a WGS84 coordinate."
+    },
+    {
+      "name": "coordinateuncertaintyinmeters",
+      "description": "See dwc:coordinateUncertaintyInMeters."
+    },
+    {
+      "name": "coordinateprecision",
+      "description": "See dwc:coordinatePrecision."
+    },
+    {
+      "name": "elevation",
+      "description": "See dwc:elevation. If provided by the data publisher, GBIF's interpretation has normalized this value to metres."
+    },
+    {
+      "name": "elevationaccuracy",
+      "description": "See dwc:elevationAccuracy. If provided by the data publisher, GBIF's interpretation has normalized this value to metres."
+    },
+    {
+      "name": "depth",
+      "description": "See dwc:depth. If provided by the data publisher, GBIF's interpretation has normalized this value to metres."
+    },
+    {
+      "name": "depthaccuracy",
+      "description": "See dwc:depthAccuracy. If provided by the data publisher, GBIF's interpretation has normalized this value to metres."
+    },
+    {
+      "name": "eventdate",
+      "description": "See dwc:eventDate. GBIF's interpretation has normalized this value to an ISO 8601 date with a local time."
+    },
+    {
+      "name": "day",
+      "description": "See dwc:day."
+    },
+    {
+      "name": "month",
+      "description": "See dwc:month."
+    },
+    {
+      "name": "year",
+      "description": "See dwc:year."
+    },
+    {
+      "name": "taxonkey",
+      "description": "The numeric identifier for the taxon in GBIF's backbone taxonomy corresponding to scientificname."
+    },
+    {
+      "name": "specieskey",
+      "description": "The numeric identifier for the taxon in GBIF's backbone taxonomy corresponding to species."
+    },
+    {
+      "name": "basisofrecord",
+      "description": "See dwc:basisOfRecord. One of PRESERVED_SPECIMEN, FOSSIL_SPECIMEN, LIVING_SPECIMEN, OBSERVATION, HUMAN_OBSERVATION, MACHINE_OBSERVATION, MATERIAL_SAMPLE, LITERATURE, UNKNOWN."
+    },
+    {
+      "name": "institutioncode",
+      "description": "See dwc:institutionCode."
+    },
+    {
+      "name": "collectioncode",
+      "description": "See dwc:collectionCode."
+    },
+    {
+      "name": "catalognumber",
+      "description": "See dwc:catalogNumber."
+    },
+    {
+      "name": "recordnumber",
+      "description": "See dwc:recordNumber."
+    },
+    {
+      "name": "identifiedby",
+      "description": "See dwc:identifiedBy."
+    },
+    {
+      "name": "dateidentified",
+      "description": "See dwc:dateIdentified. An ISO 8601 date."
+    },
+    {
+      "name": "license",
+      "description": "See dwc:license. Either CC0_1_0 or CC_BY_4_0. CC_BY_NC_4_0 records are not present in this snapshot."
+    },
+    {
+      "name": "rightsholder",
+      "description": "See dwc:rightsHolder."
+    },
+    {
+      "name": "recordedby",
+      "description": "See dwc:recordedBy."
+    },
+    {
+      "name": "typestatus",
+      "description": "See dwc:typeStatus."
+    },
+    {
+      "name": "establishmentmeans",
+      "description": "See dwc:establishmentMeans."
+    },
+    {
+      "name": "lastinterpreted",
+      "description": "The ISO 8601 date when the record was last processed by GBIF. Data are reprocessed for several reasons, including changes to the backbone taxonomy, so this date is not necessarily the date the occurrence record last changed."
+    },
+    {
+      "name": "mediatype",
+      "description": "See dwc:mediaType. May contain StillImage, MovingImage or Sound (from enumeration, detailing whether the occurrence has this media available."
+    },
+    {
+      "name": "issue",
+      "description": "A list of issues encountered by GBIF in processing this record. More details are available on these issues and flags in this blog post."
+    }
+  ],
+  "table:geo_arrow_metadata": {
+    "primary_column": "geometry",
+    "columns": {
+      "geometry": {
+        "crs": null,
+        "encoding": "WKB",
+        "bbox": [
+          -179.966667,
+          -84.5833,
+          179.192,
+          78.95
+        ]
+      }
+    },
+    "schema_version": "0.1.0",
+    "creator": {
+      "library": "geopandas",
+      "version": "0.9.0"
+    }
+  },
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -180,
+          -90,
+          180,
+          90
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2021-08-01T00:00:00Z",
+          null
+        ]
+      ]
+    }
+  },
+  "license": "proprietary"
+}

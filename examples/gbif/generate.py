@@ -63,18 +63,20 @@ def main():
             "network and data infrastructure funded by the world's governments providing global data that "
             "document the occurrence of species."
         ),
-        extent={
-            "spatial": [[-180, -90, 180, 90]],
-            "temporal": [["2021-08-01T00:00:00Z"]],
-        },
+        extent=pystac.Extent(
+            spatial=pystac.collection.SpatialExtent([[-180, -90, 180, 90]]),
+            temporal=pystac.collection.TemporalExtent(
+                [[datetime.datetime(2021, 8, 1), None]]
+            ),
+        ),
     )
     collection.extra_fields["table:columns"] = result.properties["table:columns"]
     collection.extra_fields["table:geo_arrow_metadata"] = result.properties[
         "table:geo_arrow_metadata"
     ]
 
-    with open("item.json", "w") as f:
-        json.dump(result.to_dict(), f, indent=2)
+    with open("catalog.json", "w") as f:
+        json.dump(collection.to_dict(), f, indent=2)
 
 
 if __name__ == "__main__":
