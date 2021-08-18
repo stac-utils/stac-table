@@ -1,8 +1,10 @@
+import datetime
 import os
 import shutil
 import warnings
 from pathlib import Path
 
+import pandas as pd
 import dask_geopandas
 import geopandas
 import pyarrow.parquet
@@ -23,15 +25,14 @@ def ensure_clean():
 
 
 @pytest.mark.usefixtures("ensure_clean")
+@pytest.mark.filterwarnings("ignore:An exception was ignored")
+@pytest.mark.filterwarnings("ignore:.*initial implementation.*")
+@pytest.mark.filterwarnings("ignore:.ParquetDataset.p.*")
 class TestItem:
     @pytest.mark.parametrize("partition", [True, False])
     @pytest.mark.parametrize("as_path", [True, False])
     def test_generate_item(self, partition, as_path):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", message="An exception was ignored")
-            gdf = geopandas.read_file(
-                geopandas.datasets.get_path("naturalearth_lowres")
-            )
+        gdf = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
 
         union = gdf["geometry"].unary_union
         geometry = shapely.geometry.mapping(union)
@@ -40,11 +41,7 @@ class TestItem:
         if partition:
             gdf = dask_geopandas.from_geopandas(gdf, npartitions=2)
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore", message=".*initial implementation of Parquet.*"
-            )
-            gdf.to_parquet("data.parquet")
+        gdf.to_parquet("data.parquet")
 
         item = pystac.Item("naturalearth_lowres", geometry, bbox, "2021-01-01", {})
         if as_path:
@@ -106,3 +103,73 @@ class TestItem:
             assert asset.roles == ["data", "root"]
         else:
             assert asset.roles == ["data"]
+
+    def test_infer_bbox(self):
+        df = geopandas.GeoDataFrame(
+            {"A": [1, 2]},
+            geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
+        )
+        df.to_parquet("data.parquet")
+        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
+        result = stac_table.generate(ds, item, infer_bbox=True)
+
+        assert result.bbox == (1.0, 2.0, 2.0, 3.0)
+
+    def test_infer_geometry(self):
+        df = geopandas.GeoDataFrame(
+            {"A": [1, 2]},
+            geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
+        )
+        df.to_parquet("data.parquet")
+        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
+        result = stac_table.generate(ds, item, infer_geometry=True)
+
+        assert result.geometry == {
+            "type": "MultiPoint",
+            "coordinates": ((1.0, 2.0), (2.0, 3.0)),
+        }
+
+    def test_infer_datetime_midpoint(self):
+        df = geopandas.GeoDataFrame(
+            {"A": [pd.Timestamp("2000-01-01"), pd.Timestamp("2000-01-03")]},
+            geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
+        )
+        df.to_parquet("data.parquet")
+        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
+        result = stac_table.generate(
+            ds, item, datetime_column="A", infer_datetime="midpoint"
+        )
+
+        assert result.properties["datetime"] == datetime.datetime(2000, 1, 2)
+
+    def test_infer_datetime_unique(self):
+        df = geopandas.GeoDataFrame(
+            {"A": [pd.Timestamp("2000-01-01"), pd.Timestamp("2000-01-01")]},
+            geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
+        )
+        df.to_parquet("data.parquet")
+        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
+        result = stac_table.generate(
+            ds, item, datetime_column="A", infer_datetime="unique"
+        )
+
+        assert result.properties["datetime"] == datetime.datetime(2000, 1, 1)
+
+    def test_infer_datetime_range(self):
+        df = geopandas.GeoDataFrame(
+            {"A": [pd.Timestamp("2000-01-01"), pd.Timestamp("2000-01-03")]},
+            geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
+        )
+        df.to_parquet("data.parquet")
+        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
+        result = stac_table.generate(
+            ds, item, datetime_column="A", infer_datetime="range"
+        )
+
+        assert result.properties["start_datetime"] == datetime.datetime(2000, 1, 1)
+        assert result.properties["end_datetime"] == datetime.datetime(2000, 1, 3)
