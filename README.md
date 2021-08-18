@@ -7,13 +7,13 @@ This library generates STAC objects for tabular dataset. It uses the [`table`][t
 Generate a STAC item from a Parquet Dataset.
 
 ```python
->>> import geopandas, pyarrow.parquet, pystac, stac_table
+>>> import datetime, geopandas, pyarrow.parquet, pystac, stac_table
 >>> # generate the sample data
 >>> gdf = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
 >>> gdf.to_parquet("data.parquet")
 >>> # Create the template Item
 >>> item = pystac.Item(
-...     "naturalearth_lowres", geometry=None, bbox=None, datetime="2021-01-01", properties={}
+...     "naturalearth_lowres", geometry=None, bbox=None, datetime=datetime.datetime(2021, 1, 1), properties={}
 ... )
 >>> ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
 >>> result = stac_table.generate(ds, item)
@@ -30,7 +30,7 @@ The new item is updated to include the `table` STAC extension
 
 The updated fields are available under `properties`.
 
-````python
+```python
 >>> result.properties["table:columns"]
 [{'name': 'pop_est', 'metadata': None},
  {'name': 'continent', 'metadata': None},
@@ -46,6 +46,16 @@ The updated fields are available under `properties`.
    'bbox': [-180.0, -90.0, 180.00000000000006, 83.64513000000001]}},
  'schema_version': '0.1.0',
  'creator': {'library': 'geopandas', 'version': '0.9.0'}}
+```
+
+Finally, an Asset is added with a link to the  the dataset,
+
+```python
+>>> result.assets["data"].to_dict()
+{'href': 'data.parquet',
+ 'type': 'application/x-parquet',
+ 'title': 'Dataset root',
+ 'roles': ['data']}
 ```
 
 [table]: https://github.com/TomAugspurger/table

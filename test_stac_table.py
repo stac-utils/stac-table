@@ -25,7 +25,8 @@ def ensure_clean():
 @pytest.mark.usefixtures("ensure_clean")
 class TestItem:
     @pytest.mark.parametrize("partition", [True, False])
-    def test_generate_item(self, partition):
+    @pytest.mark.parametrize("as_path", [True, False])
+    def test_generate_item(self, partition, as_path):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message="An exception was ignored")
             gdf = geopandas.read_file(
@@ -45,9 +46,14 @@ class TestItem:
             )
             gdf.to_parquet("data.parquet")
 
-        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
-
         item = pystac.Item("naturalearth_lowres", geometry, bbox, "2021-01-01", {})
+        if as_path:
+            ds = str(Path("data.parquet").absolute())
+        else:
+            ds = pyarrow.parquet.ParquetDataset(
+                "data.parquet", use_legacy_dataset=False
+            )
+
         result = stac_table.generate(ds, item)
 
         expected_columns = [
@@ -88,9 +94,15 @@ class TestItem:
             result.properties["table:geo_arrow_metadata"] == expected_geo_arrow_metadata
         )
 
-        # From a path
-        result = stac_table.generate(str(Path("data.parquet").absolute()), item)
-        assert result.properties["table:columns"] == expected_columns
-        assert (
-            result.properties["table:geo_arrow_metadata"] == expected_geo_arrow_metadata
-        )
+        asset = result.assets["data"]
+        if as_path:
+            # consequence of passing in an abspath due to that fsspec / pyarrow fs issue
+            assert asset.href == ds
+        else:
+            assert asset.href == "data.parquet"
+
+        assert asset.media_type == "application/x-parquet"
+        if partition:
+            assert asset.roles == ["data", "root"]
+        else:
+            assert asset.roles == ["data"]

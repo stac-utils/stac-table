@@ -8,18 +8,21 @@ import pystac
 import pyarrow
 import pyarrow.parquet
 import fsspec
+from pathlib import Path
 from typing import TypeVar, Union
 
 
 T = TypeVar("T", pystac.Collection, pystac.Item)
 SCHEMA_URI = "https://stac-extensions.github.io/table/v1.0.0/schema.json"
+# https://issues.apache.org/jira/browse/PARQUET-1889: parquet doesn't officially have a type yet.
+PARQUET_MEDIA_TYPE = "application/x-parquet"
 
 
 def generate(
     ds: Union[str, pyarrow.parquet.ParquetDataset],
     template,
     storage_options=None,
-    add_assets=True,
+    asset="data",
 ) -> T:
     """
     Generate a STAC Item from a Parquet Dataset.
@@ -64,6 +67,39 @@ def generate(
 
     if SCHEMA_URI not in template.stac_extensions:
         template.stac_extensions.append(SCHEMA_URI)
+
+    if asset:
+        # What's the best way to get the root of the ParquetDataset?
+        files = ds.files
+        if len(files) == 0:
+            raise ValueError("Dataset %s has no files", ds)
+        elif len(files) == 1:
+            href = files[0]
+            roles = ["data"]
+        else:
+            href = str(Path(files[0]).parent)
+            roles = ["data", "root"]
+
+        template.add_asset(
+            asset,
+            pystac.asset.Asset(
+                href, title="Dataset root", media_type=PARQUET_MEDIA_TYPE, roles=roles
+            ),
+        )
+        # TODO: https://github.com/TomAugspurger/stac-table/issues/1
+        # Figure out if we want assets for each partition. IMO, they're redundant.
+
+        # if len(files) > 1:
+        #     for i, file in enumerate(files):
+        #         template.add_asset(
+        #             f"part.{i}",
+        #             pystac.asset.Asset(
+        #                 file,
+        #                 title=f"Part {i}",
+        #                 media_type=PARQUET_MEDIA_TYPE,
+        #                 roles=["data", "part"],
+        #             ),
+        #         )
 
     return template
 
