@@ -8,7 +8,7 @@ authors = [{name = "Tom Augspurger", email = "taugspurger@microsoft.com"}]
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
-    "dask_geopandas",
+    # "git+https://geopandas/dask-geopandas",
     "dask",
     "fsspec",
     "pandas",
@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = [
+dev = [
     "pytest >=2.7.3",
     "pytest-cov",
     "pre-commit"

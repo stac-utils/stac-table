@@ -58,4 +58,10 @@ Finally, an Asset is added with a link to the  the dataset,
  'roles': ['data']}
 ```
 
+`stac_table` will optionally fill in some additional values in your STAC item if you pass the appropriate keywords.
+
+* `infer_bbox`: Sets the item's `bbox` to the bounding box of the union of the geometry column's values. Relies on spatial partitions.
+* `infer_geometry`: Sets the item's `geometry` to the union of the geometry column's values.
+* `infer_datetime`: Sets the item's `properties.datetime` or `properties.start_datetime` and `properties.end_daetime` based on the values in the `datetime_column` column.
+
 [table]: https://github.com/TomAugspurger/table
