@@ -47,15 +47,15 @@ class TestItem:
         result = stac_table.generate(ds, item)
 
         expected_columns = [
-            {"name": "pop_est", "metadata": None},
-            {"name": "continent", "metadata": None},
-            {"name": "name", "metadata": None},
-            {"name": "iso_a3", "metadata": None},
-            {"name": "gdp_md_est", "metadata": None},
-            {"name": "geometry", "metadata": None},
+            {"name": "pop_est"},
+            {"name": "continent"},
+            {"name": "name"},
+            {"name": "iso_a3"},
+            {"name": "gdp_md_est"},
+            {"name": "geometry"},
         ]
         if partition:
-            expected_columns.append({"name": "__null_dask_index__", "metadata": None})
+            expected_columns.append({"name": "__null_dask_index__"})
         assert result.properties["table:columns"] == expected_columns
 
         expected_geo_arrow_metadata = {
@@ -156,3 +156,24 @@ class TestItem:
 
         assert result.properties["start_datetime"] == datetime.datetime(2000, 1, 1)
         assert result.properties["end_datetime"] == datetime.datetime(2000, 1, 3)
+
+    def test_metadata(self):
+        df = geopandas.GeoDataFrame(
+            {"A": [pd.Timestamp("2000-01-01"), pd.Timestamp("2000-01-03")]},
+            geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
+        )
+        df.to_parquet("data.parquet")
+        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        result = stac_table.generate(
+            "data.parquet", item, datetime_column="A", infer_datetime="range"
+        )
+        assert "metadata" not in result.properties["table:columns"][0]
+
+        # Bug in pandas? We apparently aren't writing the metadata...
+        # df["A"].attrs = {"key": "value!"}
+        # df.to_parquet("data.parquet")
+        # item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        # result = stac_table.generate(
+        #     "data.parquet", item, datetime_column="A", infer_datetime="range"
+        # )
+        # assert result.properties["table:columns"][0]["metadata"] == {"key": "value!"}

@@ -6,252 +6,202 @@
     "table:columns": [
       {
         "name": "gbifid",
-        "metadata": null,
         "description": "GBIF's identifier for the occurrence"
       },
       {
         "name": "datasetkey",
-        "metadata": null,
         "description": "GBIF's UUID for the dataset containing this occurrence"
       },
       {
         "name": "occurrenceid",
-        "metadata": null,
         "description": "See dwc:occurrenceID."
       },
       {
         "name": "kingdom",
-        "metadata": null,
         "description": "See dwc:kingdom. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "phylum",
-        "metadata": null,
         "description": "See dwc:phylum. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "class",
-        "metadata": null,
         "description": "See dwc:class. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "order",
-        "metadata": null,
         "description": "See dwc:order. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "family",
-        "metadata": null,
         "description": "See dwc:family. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "genus",
-        "metadata": null,
         "description": "See dwc:genus. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "species",
-        "metadata": null,
         "description": "See dwc:species. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "infraspecificepithet",
-        "metadata": null,
         "description": "See dwc:infraspecificEpithet. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "taxonrank",
-        "metadata": null,
         "description": "See dwc:taxonRank. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "scientificname",
-        "metadata": null,
         "description": "See dwc:scientificName. This field has been aligned with the GBIF backbone taxonomy."
       },
       {
         "name": "verbatimscientificname",
-        "metadata": null,
         "description": "The scientific name as provided by the data publisher"
       },
       {
         "name": "verbatimscientificnameauthorship",
-        "metadata": null,
         "description": "The scientific name authorship provided by the data publisher."
       },
       {
         "name": "countrycode",
-        "metadata": null,
         "description": "See dwc:countryCode. GBIF's interpretation has set this to an ISO 3166-2 code."
       },
       {
         "name": "locality",
-        "metadata": null,
         "description": "See dwc:locality."
       },
       {
         "name": "stateprovince",
-        "metadata": null,
         "description": "See dwc:stateProvince."
       },
       {
         "name": "occurrencestatus",
-        "metadata": null,
         "description": "See dwc:occurrenceStatus. Either the value PRESENT or ABSENT. Many users will wish to filter for PRESENT data."
       },
       {
         "name": "individualcount",
-        "metadata": null,
         "description": "See dwc:individualCount."
       },
       {
         "name": "publishingorgkey",
-        "metadata": null,
         "description": "GBIF's UUID for the organization publishing this occurrence."
       },
       {
         "name": "decimallatitude",
-        "metadata": null,
         "description": "See dwc:decimalLatitude. GBIF's interpretation has normalized this to a WGS84 coordinate."
       },
       {
         "name": "decimallongitude",
-        "metadata": null,
         "description": "See dwc:decimalLongitude. GBIF's interpretation has normalized this to a WGS84 coordinate."
       },
       {
         "name": "coordinateuncertaintyinmeters",
-        "metadata": null,
         "description": "See dwc:coordinateUncertaintyInMeters."
       },
       {
         "name": "coordinateprecision",
-        "metadata": null,
         "description": "See dwc:coordinatePrecision."
       },
       {
         "name": "elevation",
-        "metadata": null,
         "description": "See dwc:elevation. If provided by the data publisher, GBIF's interpretation has normalized this value to metres."
       },
       {
         "name": "elevationaccuracy",
-        "metadata": null,
         "description": "See dwc:elevationAccuracy. If provided by the data publisher, GBIF's interpretation has normalized this value to metres."
       },
       {
         "name": "depth",
-        "metadata": null,
         "description": "See dwc:depth. If provided by the data publisher, GBIF's interpretation has normalized this value to metres."
       },
       {
         "name": "depthaccuracy",
-        "metadata": null,
         "description": "See dwc:depthAccuracy. If provided by the data publisher, GBIF's interpretation has normalized this value to metres."
       },
       {
         "name": "eventdate",
-        "metadata": null,
         "description": "See dwc:eventDate. GBIF's interpretation has normalized this value to an ISO 8601 date with a local time."
       },
       {
         "name": "day",
-        "metadata": null,
         "description": "See dwc:day."
       },
       {
         "name": "month",
-        "metadata": null,
         "description": "See dwc:month."
       },
       {
         "name": "year",
-        "metadata": null,
         "description": "See dwc:year."
       },
       {
         "name": "taxonkey",
-        "metadata": null,
         "description": "The numeric identifier for the taxon in GBIF's backbone taxonomy corresponding to scientificname."
       },
       {
         "name": "specieskey",
-        "metadata": null,
         "description": "The numeric identifier for the taxon in GBIF's backbone taxonomy corresponding to species."
       },
       {
         "name": "basisofrecord",
-        "metadata": null,
         "description": "See dwc:basisOfRecord. One of PRESERVED_SPECIMEN, FOSSIL_SPECIMEN, LIVING_SPECIMEN, OBSERVATION, HUMAN_OBSERVATION, MACHINE_OBSERVATION, MATERIAL_SAMPLE, LITERATURE, UNKNOWN."
       },
       {
         "name": "institutioncode",
-        "metadata": null,
         "description": "See dwc:institutionCode."
       },
       {
         "name": "collectioncode",
-        "metadata": null,
         "description": "See dwc:collectionCode."
       },
       {
         "name": "catalognumber",
-        "metadata": null,
         "description": "See dwc:catalogNumber."
       },
       {
         "name": "recordnumber",
-        "metadata": null,
         "description": "See dwc:recordNumber."
       },
       {
         "name": "identifiedby",
-        "metadata": null,
         "description": "See dwc:identifiedBy."
       },
       {
         "name": "dateidentified",
-        "metadata": null,
         "description": "See dwc:dateIdentified. An ISO 8601 date."
       },
       {
         "name": "license",
-        "metadata": null,
         "description": "See dwc:license. Either CC0_1_0 or CC_BY_4_0. CC_BY_NC_4_0 records are not present in this snapshot."
       },
       {
         "name": "rightsholder",
-        "metadata": null,
         "description": "See dwc:rightsHolder."
       },
       {
         "name": "recordedby",
-        "metadata": null,
         "description": "See dwc:recordedBy."
       },
       {
         "name": "typestatus",
-        "metadata": null,
         "description": "See dwc:typeStatus."
       },
       {
         "name": "establishmentmeans",
-        "metadata": null,
         "description": "See dwc:establishmentMeans."
       },
       {
         "name": "lastinterpreted",
-        "metadata": null,
         "description": "The ISO 8601 date when the record was last processed by GBIF. Data are reprocessed for several reasons, including changes to the backbone taxonomy, so this date is not necessarily the date the occurrence record last changed."
       },
       {
         "name": "mediatype",
-        "metadata": null,
         "description": "See dwc:mediaType. May contain StillImage, MovingImage or Sound (from enumeration, detailing whether the occurrence has this media available."
       },
       {
         "name": "issue",
-        "metadata": null,
         "description": "A list of issues encountered by GBIF in processing this record. More details are available on these issues and flags in this blog post."
       }
     ],

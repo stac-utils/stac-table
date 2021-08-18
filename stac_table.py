@@ -179,7 +179,9 @@ def generate(
 def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
     columns = []
     for field in ds.schema:
-        column = {"name": field.name, "metadata": field.metadata}
+        column = {"name": field.name}
+        if field.metadata is not None:
+            column["metadata"] = field.metadata
         columns.append(column)
     return columns
 
