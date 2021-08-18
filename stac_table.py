@@ -213,8 +213,10 @@ def generate(
 
 def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
     columns = []
-    for field in ds.schema:
-        column = {"name": field.name}
+    fragment = ds.fragments[0]
+
+    for field, col in zip(ds.schema, fragment.metadata.schema):
+        column = {"name": field.name, "type": col.physical_type.lower()}
         if field.metadata is not None:
             column["metadata"] = field.metadata
         columns.append(column)
