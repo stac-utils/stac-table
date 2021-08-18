@@ -32,7 +32,7 @@ class InferDatetimeOptions(str, enum.Enum):
 
 
 def generate(
-    ds: Union[str, pyarrow.parquet.ParquetDataset],
+    uri: str,
     template,
     infer_bbox=None,
     infer_geometry=False,
@@ -47,13 +47,8 @@ def generate(
 
     Parameters
     ----------
-    ds : pyarrow.parquet.ParquetDataset or str
-        The input table to generate a STAC item for. For `str` input, this is
-        treated as an fsspec-compatible URI. The fsspec filesystem is loaded and
-        the ParquetDataset is loaded using that filesystem.
-
-        If providing as a `pyarrow.parquet.ParquetDataset`, make sure to use
-        ``use_legacy_dataset=False``.
+    uri : str
+        The fsspec-compatible URI pointing to the input table to generate a STAC item for.
     template : pystac.Item
         The template item. This will be cloned and new data will be filled in.
     infer_bbox : str, optional
@@ -96,15 +91,14 @@ def generate(
     template = copy.deepcopy(template)
 
     data = None
-    if isinstance(ds, str):
-        storage_options = storage_options or {}
-        # data = dask_geopandas.read_parquet(
-        #     ds, storage_options=storage_options
-        # )
-        ds = parquet_dataset_from_url(ds, storage_options)
+    storage_options = storage_options or {}
+    # data = dask_geopandas.read_parquet(
+    #     ds, storage_options=storage_options
+    # )
+    ds = parquet_dataset_from_url(uri, storage_options)
 
     if infer_bbox or infer_geometry or infer_datetime != InferDatetimeOptions.no:
-        data = dask_geopandas.read_parquet(ds, storage_options=storage_options)
+        data = dask_geopandas.read_parquet(uri, storage_options=storage_options)
     #     # TODO: this doesn't actually work
     #     data = dask_geopandas.read_parquet(
     #         ds.files, storage_options={"filesystem": ds.filesystem}

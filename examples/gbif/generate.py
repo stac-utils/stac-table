@@ -1,12 +1,13 @@
 """
 Generates a STAC item for GBIF, using the parquet files on Azure: http://aka.ms/ai4edata-gbif.
 
-Requires `adlfs` in addition to the other packages.
+Requires `adlfs` and `lxml` in addition to the other packages.
 """
 import json
 import stac_table
 import datetime
 import pystac
+import pandas as pd
 
 
 def main():
@@ -38,6 +39,20 @@ def main():
         storage_options=storage_options,
         geo_arrow_metadata=geo_arrow_metadata,
     )
+
+    # Add in the descriptions
+    descriptions = (
+        pd.read_html(
+            "https://github.com/microsoft/AIforEarthDataSets/blob/main/data/gbif.md"
+        )[0]
+        .set_axis(["field", "type", "nullable", "description"], axis="columns")
+        .set_index("field")["description"]
+        .to_dict()
+    )
+
+    for column in result.properties["table:columns"]:
+        column["description"] = descriptions[column["name"]]
+
     with open("item.json", "w") as f:
         json.dump(result.to_dict(), f, indent=2)
 

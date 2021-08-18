@@ -30,8 +30,7 @@ def ensure_clean():
 @pytest.mark.filterwarnings("ignore:.ParquetDataset.p.*")
 class TestItem:
     @pytest.mark.parametrize("partition", [True, False])
-    @pytest.mark.parametrize("as_path", [True, False])
-    def test_generate_item(self, partition, as_path):
+    def test_generate_item(self, partition):
         gdf = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
 
         union = gdf["geometry"].unary_union
@@ -44,13 +43,7 @@ class TestItem:
         gdf.to_parquet("data.parquet")
 
         item = pystac.Item("naturalearth_lowres", geometry, bbox, "2021-01-01", {})
-        if as_path:
-            ds = str(Path("data.parquet").absolute())
-        else:
-            ds = pyarrow.parquet.ParquetDataset(
-                "data.parquet", use_legacy_dataset=False
-            )
-
+        ds = str(Path("data.parquet").absolute())
         result = stac_table.generate(ds, item)
 
         expected_columns = [
@@ -92,12 +85,7 @@ class TestItem:
         )
 
         asset = result.assets["data"]
-        if as_path:
-            # consequence of passing in an abspath due to that fsspec / pyarrow fs issue
-            assert asset.href == ds
-        else:
-            assert asset.href == "data.parquet"
-
+        assert asset.href == ds
         assert asset.media_type == "application/x-parquet"
         if partition:
             assert asset.roles == ["data", "root"]
@@ -111,8 +99,7 @@ class TestItem:
         )
         df.to_parquet("data.parquet")
         item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
-        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
-        result = stac_table.generate(ds, item, infer_bbox=True)
+        result = stac_table.generate("data.parquet", item, infer_bbox=True)
 
         assert result.bbox == (1.0, 2.0, 2.0, 3.0)
 
@@ -123,8 +110,7 @@ class TestItem:
         )
         df.to_parquet("data.parquet")
         item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
-        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
-        result = stac_table.generate(ds, item, infer_geometry=True)
+        result = stac_table.generate("data.parquet", item, infer_geometry=True)
 
         assert result.geometry == {
             "type": "MultiPoint",
@@ -138,9 +124,8 @@ class TestItem:
         )
         df.to_parquet("data.parquet")
         item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
-        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
         result = stac_table.generate(
-            ds, item, datetime_column="A", infer_datetime="midpoint"
+            "data.parquet", item, datetime_column="A", infer_datetime="midpoint"
         )
 
         assert result.properties["datetime"] == datetime.datetime(2000, 1, 2)
@@ -152,9 +137,8 @@ class TestItem:
         )
         df.to_parquet("data.parquet")
         item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
-        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
         result = stac_table.generate(
-            ds, item, datetime_column="A", infer_datetime="unique"
+            "data.parquet", item, datetime_column="A", infer_datetime="unique"
         )
 
         assert result.properties["datetime"] == datetime.datetime(2000, 1, 1)
@@ -166,9 +150,8 @@ class TestItem:
         )
         df.to_parquet("data.parquet")
         item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
-        ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
         result = stac_table.generate(
-            ds, item, datetime_column="A", infer_datetime="range"
+            "data.parquet", item, datetime_column="A", infer_datetime="range"
         )
 
         assert result.properties["start_datetime"] == datetime.datetime(2000, 1, 1)
