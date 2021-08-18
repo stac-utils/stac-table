@@ -39,8 +39,8 @@ def generate(
     datetime_column=None,
     infer_datetime=InferDatetimeOptions.no,
     asset="data",
-    storage_options=None,
     geo_arrow_metadata=True,
+    storage_options=None,
 ) -> T:
     """
     Generate a STAC Item from a Parquet Dataset.
@@ -75,11 +75,19 @@ def generate(
         - unique : Set `datetime` to the unique value. Raises if more than one unique value is found.
         - range : Set `start_datetime` and `end_datetime` to the minimum and maximum values.
 
+    asset : str, default "data"
+        The asset key to use for the parquet dataset. The asset will include
+        the role ``["data"]``. Partitioned datasets will also include the
+        role ``["root"]``.
+
+    geo_arrow_metadata : bool or dict
+        How to handle `geo_arrow_metadata`. By default, the dataset is assumed to include
+        metadata compatible with `geo_arrow_spec`. You can provide a dict with your own
+        metadata, or specify ``geo_arrow_metadata=False`` to skip adding this.
+
     storage_options: mapping, optional
         A dictionary of keywords to provide to :meth:`fsspec.get_fs_token_paths`
         when creating an fsspec filesystem with a str ``ds``.
-
-    geo_arrow_metadata : bool or dict
 
     Returns
     -------
@@ -89,6 +97,30 @@ def generate(
         * stac_extensions : added `table` extension
         * table:columns
         * table:geo_arrow_metadata
+
+    Examples
+    --------
+
+    This example generates a STAC item based on the "naturalearth_lowres" datset from geopandas.
+    There's a bit of setup.
+
+    >>> import datetime, geopandas, pystac, stac_table
+    >>> gdf = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
+    >>> gdf.to_parquet("data.parquet")
+
+    Now we can create the item.
+
+    >>> # Create the template Item
+    >>> item = pystac.Item(
+    ...     "naturalearth_lowres",
+    ...     geometry=None,
+    ...     bbox=None,
+    ...     datetime=datetime.datetime(2021, 1, 1),
+    ...     properties={},
+    ... )
+    >>> result = stac_table.generate("data.parquet", item)
+    >>> result
+    <Item id=naturalearth_lowres>
     """
     template = copy.deepcopy(template)
 

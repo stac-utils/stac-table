@@ -7,7 +7,7 @@ This library generates STAC objects for tabular dataset. It uses the [`table`][t
 Generate a STAC item from a Parquet Dataset.
 
 ```python
->>> import datetime, geopandas, pyarrow.parquet, pystac, stac_table
+>>> import datetime, geopandas, pystac, stac_table
 >>> # generate the sample data
 >>> gdf = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
 >>> gdf.to_parquet("data.parquet")
@@ -15,8 +15,7 @@ Generate a STAC item from a Parquet Dataset.
 >>> item = pystac.Item(
 ...     "naturalearth_lowres", geometry=None, bbox=None, datetime=datetime.datetime(2021, 1, 1), properties={}
 ... )
->>> ds = pyarrow.parquet.ParquetDataset("data.parquet", use_legacy_dataset=False)
->>> result = stac_table.generate(ds, item)
+>>> result = stac_table.generate("data.parquet", item)
 >>> result
 <Item id=naturalearth_lowres>
 ```
