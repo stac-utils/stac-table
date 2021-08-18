@@ -5,6 +5,9 @@ __version__ = "1.0.0"
 import json
 import copy
 import enum
+from pathlib import Path
+from typing import TypeVar, Union
+
 import dask
 import pystac
 import pandas as pd
@@ -13,8 +16,6 @@ import pyarrow.parquet
 import fsspec
 import dask_geopandas
 import shapely.geometry
-from pathlib import Path
-from typing import TypeVar, Union
 
 
 T = TypeVar("T", pystac.Collection, pystac.Item)

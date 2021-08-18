@@ -8,23 +8,19 @@ authors = [{name = "Tom Augspurger", email = "taugspurger@microsoft.com"}]
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
+    "dask_geopandas",
+    "dask",
+    "fsspec",
     "pandas",
     "pyarrow",
     "pystac>=1.1.0",
-    # "pandas",
-    # "pyproj",
-    # "pydantic",
-    # "zarr",
-    # "jsonschema",
-    # "dask[array]",  # for chunking
-    # # these are just for generate
-    # "fsspec",
-    # "adlfs",
+    "shapely",
 ]
 
 [project.optional-dependencies]
 test = [
     "pytest >=2.7.3",
     "pytest-cov",
+    "pre-commit"
 ]
 doc = ["sphinx"]
