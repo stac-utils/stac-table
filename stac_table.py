@@ -40,6 +40,7 @@ def generate(
     infer_datetime=InferDatetimeOptions.no,
     asset="data",
     storage_options=None,
+    geo_arrow_metadata=None,
 ) -> T:
     """
     Generate a STAC Item from a Parquet Dataset.
@@ -94,15 +95,24 @@ def generate(
     """
     template = copy.deepcopy(template)
 
+    data = None
     if isinstance(ds, str):
         storage_options = storage_options or {}
+        # data = dask_geopandas.read_parquet(
+        #     ds, storage_options=storage_options
+        # )
         ds = parquet_dataset_from_url(ds, storage_options)
 
-    data = dask_geopandas.read_parquet(
-        ds.files, storage_options={"filesystem": ds.filesystem}
-    )
-    columns = generate_columns(ds)
-    geo_arrow_metadata = generate_geo_arrow_metadata(ds)
+    if infer_bbox or infer_geometry or infer_datetime != InferDatetimeOptions.no:
+        data = dask_geopandas.read_parquet(ds, storage_options=storage_options)
+    #     # TODO: this doesn't actually work
+    #     data = dask_geopandas.read_parquet(
+    #         ds.files, storage_options={"filesystem": ds.filesystem}
+    #     )
+
+    columns = get_columns(ds)
+    if geo_arrow_metadata is None:
+        geo_arrow_metadata = get_geo_arrow_metadata(ds)
 
     template.properties["table:columns"] = columns
     template.properties["table:geo_arrow_metadata"] = geo_arrow_metadata
@@ -172,7 +182,7 @@ def generate(
     return template
 
 
-def generate_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
+def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
     columns = []
     for field in ds.schema:
         column = {"name": field.name, "metadata": field.metadata}
@@ -180,7 +190,7 @@ def generate_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
     return columns
 
 
-def generate_geo_arrow_metadata(ds):
+def get_geo_arrow_metadata(ds):
     if b"geo" not in ds.schema.metadata:
         raise ValueError(
             "Dataset must have a 'geo' metadata key, whose value is compatible with the geo-arrow-spec."

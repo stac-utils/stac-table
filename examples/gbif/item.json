@@ -1,0 +1,252 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "gbif-2021-08-01",
+  "properties": {
+    "table:columns": [
+      {
+        "name": "gbifid",
+        "metadata": null
+      },
+      {
+        "name": "datasetkey",
+        "metadata": null
+      },
+      {
+        "name": "occurrenceid",
+        "metadata": null
+      },
+      {
+        "name": "kingdom",
+        "metadata": null
+      },
+      {
+        "name": "phylum",
+        "metadata": null
+      },
+      {
+        "name": "class",
+        "metadata": null
+      },
+      {
+        "name": "order",
+        "metadata": null
+      },
+      {
+        "name": "family",
+        "metadata": null
+      },
+      {
+        "name": "genus",
+        "metadata": null
+      },
+      {
+        "name": "species",
+        "metadata": null
+      },
+      {
+        "name": "infraspecificepithet",
+        "metadata": null
+      },
+      {
+        "name": "taxonrank",
+        "metadata": null
+      },
+      {
+        "name": "scientificname",
+        "metadata": null
+      },
+      {
+        "name": "verbatimscientificname",
+        "metadata": null
+      },
+      {
+        "name": "verbatimscientificnameauthorship",
+        "metadata": null
+      },
+      {
+        "name": "countrycode",
+        "metadata": null
+      },
+      {
+        "name": "locality",
+        "metadata": null
+      },
+      {
+        "name": "stateprovince",
+        "metadata": null
+      },
+      {
+        "name": "occurrencestatus",
+        "metadata": null
+      },
+      {
+        "name": "individualcount",
+        "metadata": null
+      },
+      {
+        "name": "publishingorgkey",
+        "metadata": null
+      },
+      {
+        "name": "decimallatitude",
+        "metadata": null
+      },
+      {
+        "name": "decimallongitude",
+        "metadata": null
+      },
+      {
+        "name": "coordinateuncertaintyinmeters",
+        "metadata": null
+      },
+      {
+        "name": "coordinateprecision",
+        "metadata": null
+      },
+      {
+        "name": "elevation",
+        "metadata": null
+      },
+      {
+        "name": "elevationaccuracy",
+        "metadata": null
+      },
+      {
+        "name": "depth",
+        "metadata": null
+      },
+      {
+        "name": "depthaccuracy",
+        "metadata": null
+      },
+      {
+        "name": "eventdate",
+        "metadata": null
+      },
+      {
+        "name": "day",
+        "metadata": null
+      },
+      {
+        "name": "month",
+        "metadata": null
+      },
+      {
+        "name": "year",
+        "metadata": null
+      },
+      {
+        "name": "taxonkey",
+        "metadata": null
+      },
+      {
+        "name": "specieskey",
+        "metadata": null
+      },
+      {
+        "name": "basisofrecord",
+        "metadata": null
+      },
+      {
+        "name": "institutioncode",
+        "metadata": null
+      },
+      {
+        "name": "collectioncode",
+        "metadata": null
+      },
+      {
+        "name": "catalognumber",
+        "metadata": null
+      },
+      {
+        "name": "recordnumber",
+        "metadata": null
+      },
+      {
+        "name": "identifiedby",
+        "metadata": null
+      },
+      {
+        "name": "dateidentified",
+        "metadata": null
+      },
+      {
+        "name": "license",
+        "metadata": null
+      },
+      {
+        "name": "rightsholder",
+        "metadata": null
+      },
+      {
+        "name": "recordedby",
+        "metadata": null
+      },
+      {
+        "name": "typestatus",
+        "metadata": null
+      },
+      {
+        "name": "establishmentmeans",
+        "metadata": null
+      },
+      {
+        "name": "lastinterpreted",
+        "metadata": null
+      },
+      {
+        "name": "mediatype",
+        "metadata": null
+      },
+      {
+        "name": "issue",
+        "metadata": null
+      }
+    ],
+    "table:geo_arrow_metadata": {
+      "primary_column": "geometry",
+      "columns": {
+        "geometry": {
+          "crs": null,
+          "encoding": "WKB",
+          "bbox": [
+            -179.966667,
+            -84.5833,
+            179.192,
+            78.95
+          ]
+        }
+      },
+      "schema_version": "0.1.0",
+      "creator": {
+        "library": "geopandas",
+        "version": "0.9.0"
+      }
+    },
+    "datetime": "2021-08-01T00:00:00Z"
+  },
+  "geometry": null,
+  "links": [],
+  "assets": {
+    "data": {
+      "href": "gbif/occurrence/2021-08-01/occurrence.parquet",
+      "type": "application/x-parquet",
+      "title": "Dataset root",
+      "roles": [
+        "data",
+        "root"
+      ]
+    }
+  },
+  "bbox": [
+    -180,
+    -90,
+    180,
+    90
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/table/v1.0.0/schema.json"
+  ]
+}
