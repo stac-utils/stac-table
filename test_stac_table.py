@@ -47,15 +47,15 @@ class TestItem:
         result = stac_table.generate(ds, item)
 
         expected_columns = [
-            {"name": "pop_est"},
-            {"name": "continent"},
-            {"name": "name"},
-            {"name": "iso_a3"},
-            {"name": "gdp_md_est"},
-            {"name": "geometry"},
+            {"name": "pop_est", "type": "int64"},
+            {"name": "continent", "type": "byte_array"},
+            {"name": "name", "type": "byte_array"},
+            {"name": "iso_a3", "type": "byte_array"},
+            {"name": "gdp_md_est", "type": "double"},
+            {"name": "geometry", "type": "byte_array"},
         ]
         if partition:
-            expected_columns.append({"name": "__null_dask_index__"})
+            expected_columns.append({"name": "__null_dask_index__", "type": "int64"})
         assert result.properties["table:columns"] == expected_columns
 
         expected_geo_arrow_metadata = {
