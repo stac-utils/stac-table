@@ -24,27 +24,21 @@ The new item is updated to include the `table` STAC extension
 
 ```python
 >>> result.stac_extensions
-['https://stac-extensions.github.io/table/v1.0.0/schema.json']
+['https://stac-extensions.github.io/table/v1.0.0/schema.json',
+ 'https://stac-extensions.github.io/projection/v1.0.0/schema.json']
 ```
 
 The updated fields are available under `properties`.
 
 ```python
->>> result.properties["table:columns"]
-[{'name': 'pop_est', 'metadata': None},
- {'name': 'continent', 'metadata': None},
- {'name': 'name', 'metadata': None},
- {'name': 'iso_a3', 'metadata': None},
- {'name': 'gdp_md_est', 'metadata': None},
- {'name': 'geometry', 'metadata': None}]
-
->>> result.properties["table:geo_arrow_metadata"]
-{'primary_column': 'geometry',
- 'columns': {'geometry': {'crs': 'GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]',
-   'encoding': 'WKB',
-   'bbox': [-180.0, -90.0, 180.00000000000006, 83.64513000000001]}},
- 'schema_version': '0.1.0',
- 'creator': {'library': 'geopandas', 'version': '0.9.0'}}
+>>> result.properties
+{'table:columns': [{'name': 'pop_est', 'type': 'int64'},
+  {'name': 'continent', 'type': 'byte_array'},
+  {'name': 'name', 'type': 'byte_array'},
+  {'name': 'iso_a3', 'type': 'byte_array'},
+  {'name': 'gdp_md_est', 'type': 'double'},
+  {'name': 'geometry', 'type': 'byte_array'}],
+ 'proj:epsg': 4326}
 ```
 
 Finally, an Asset is added with a link to the  the dataset,

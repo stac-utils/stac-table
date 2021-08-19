@@ -38,8 +38,9 @@ def generate(
     infer_geometry=False,
     datetime_column=None,
     infer_datetime=InferDatetimeOptions.no,
-    asset="data",
-    geo_arrow_metadata=True,
+    asset_key="data",
+    asset_extra_fields=None,
+    proj=True,
     storage_options=None,
 ) -> T:
     """
@@ -75,15 +76,21 @@ def generate(
         - unique : Set `datetime` to the unique value. Raises if more than one unique value is found.
         - range : Set `start_datetime` and `end_datetime` to the minimum and maximum values.
 
-    asset : str, default "data"
-        The asset key to use for the parquet dataset. The asset will include
-        the role ``["data"]``. Partitioned datasets will also include the
-        role ``["root"]``.
+    asset_key : str, default "data"
+        The asset key to use for the parquet dataset. The href will be the ``uri`` and
+        the roles will be ``["data"]``.
 
-    geo_arrow_metadata : bool or dict
-        How to handle `geo_arrow_metadata`. By default, the dataset is assumed to include
-        metadata compatible with `geo_arrow_spec`. You can provide a dict with your own
-        metadata, or specify ``geo_arrow_metadata=False`` to skip adding this.
+    asset_extra_fields : dict, optional
+        Additional fields to set in the asset's ``extra_fields``.
+
+    proj : bool or dict, default True
+        Whether to extract projection information from the dataset and store it
+        using the `projection` extension.
+
+        By default, just `proj:crs` is extracted. If `infer_bbox` or `infer_geometry`
+        are specified, those will be set as well.
+
+        Alternatively, provide a dict of values to include.
 
     storage_options: mapping, optional
         A dictionary of keywords to provide to :meth:`fsspec.get_fs_token_paths`
@@ -96,7 +103,6 @@ def generate(
 
         * stac_extensions : added `table` extension
         * table:columns
-        * table:geo_arrow_metadata
 
     Examples
     --------
@@ -131,7 +137,12 @@ def generate(
     # )
     ds = parquet_dataset_from_url(uri, storage_options)
 
-    if infer_bbox or infer_geometry or infer_datetime != InferDatetimeOptions.no:
+    if (
+        infer_bbox
+        or infer_geometry
+        or infer_datetime != InferDatetimeOptions.no
+        or proj is True
+    ):
         data = dask_geopandas.read_parquet(uri, storage_options=storage_options)
     #     # TODO: this doesn't actually work
     #     data = dask_geopandas.read_parquet(
@@ -141,19 +152,31 @@ def generate(
     columns = get_columns(ds)
     template.properties["table:columns"] = columns
 
-    if geo_arrow_metadata is True:
-        template.properties["table:geo_arrow_metadata"] = get_geo_arrow_metadata(ds)
-    elif geo_arrow_metadata:
-        template.properties["table:geo_arrow_metadata"] = geo_arrow_metadata
+    if proj is True:
+        proj = get_proj(data)
+    proj = proj or {}
 
     if SCHEMA_URI not in template.stac_extensions:
         template.stac_extensions.append(SCHEMA_URI)
+    if proj and pystac.extensions.projection.SCHEMA_URI not in template.stac_extensions:
+        template.stac_extensions.append(pystac.extensions.projection.SCHEMA_URI)
 
+    extra_proj = {}
     if infer_bbox:
+        bbox = data.spatial_partitions.unary_union.bounds
+        # TODO: may need to convert to epsg:4326
+        extra_proj["proj:bbox"] = bbox
+
         template.bbox = data.spatial_partitions.unary_union.bounds
 
     if infer_geometry:
-        template.geometry = shapely.geometry.mapping(data.unary_union.compute())
+        geometry = shapely.geometry.mapping(data.unary_union.compute())
+        # TODO: may need to convert to epsg:4326
+        extra_proj["proj:geometry"] = geometry
+        template.geometry = geometry
+
+    if proj or extra_proj:
+        template.properties.update(**extra_proj, **proj)
 
     if infer_datetime != InferDatetimeOptions.no and datetime_column is None:
         raise ValueError("Must specify 'datetime_column' when 'infer_datetime != no'.")
@@ -175,40 +198,34 @@ def generate(
         template.properties["start_datetime"] = values[0]
         template.properties["end_datetime"] = values[1]
 
-    if asset:
-        # What's the best way to get the root of the ParquetDataset?
-        files = ds.files
-        if len(files) == 0:
-            raise ValueError("Dataset %s has no files", ds)
-        elif len(files) == 1:
-            href = files[0]
-            roles = ["data"]
-        else:
-            href = str(Path(files[0]).parent)
-            roles = ["data", "root"]
-
-        template.add_asset(
-            asset,
-            pystac.asset.Asset(
-                href, title="Dataset root", media_type=PARQUET_MEDIA_TYPE, roles=roles
-            ),
+    if asset_key:
+        asset = pystac.asset.Asset(
+            uri,
+            title="Dataset root",
+            media_type=PARQUET_MEDIA_TYPE,
+            roles=["data"],
+            extra_fields=asset_extra_fields,
         )
-        # TODO: https://github.com/TomAugspurger/stac-table/issues/1
-        # Figure out if we want assets for each partition. IMO, they're redundant.
-
-        # if len(files) > 1:
-        #     for i, file in enumerate(files):
-        #         template.add_asset(
-        #             f"part.{i}",
-        #             pystac.asset.Asset(
-        #                 file,
-        #                 title=f"Part {i}",
-        #                 media_type=PARQUET_MEDIA_TYPE,
-        #                 roles=["data", "part"],
-        #             ),
-        #         )
+        template.add_asset(asset_key, asset)
 
     return template
+
+
+def get_proj(ds):
+    """
+    Read projection information from the dataset.
+    """
+    # Use geopandas to get the proj info
+    proj = {}
+    maybe_crs = ds.geometry.crs
+    if maybe_crs:
+        maybe_epsg = ds.geometry.crs.to_epsg()
+        if maybe_epsg:
+            proj["proj:epsg"] = maybe_epsg
+        else:
+            proj["proj:wkt2"] = ds.geometry.crs.to_wkt()
+
+    return proj
 
 
 def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
@@ -221,14 +238,6 @@ def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
             column["metadata"] = field.metadata
         columns.append(column)
     return columns
-
-
-def get_geo_arrow_metadata(ds):
-    if b"geo" not in ds.schema.metadata:
-        raise ValueError(
-            "Dataset must have a 'geo' metadata key, whose value is compatible with the geo-arrow-spec."
-        )
-    return json.loads(ds.schema.metadata[b"geo"])
 
 
 def parquet_dataset_from_url(

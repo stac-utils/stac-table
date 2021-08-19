@@ -58,64 +58,42 @@ class TestItem:
             expected_columns.append({"name": "__null_dask_index__", "type": "int64"})
         assert result.properties["table:columns"] == expected_columns
 
-        expected_geo_arrow_metadata = {
-            "primary_column": "geometry",
-            "columns": {
-                "geometry": {
-                    "crs": 'GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]',
-                    "encoding": "WKB",
-                    "bbox": [-180.0, -90.0, 180.00000000000006, 83.64513000000001],
-                }
-            },
-            "schema_version": "0.1.0",
-            "creator": {"library": "geopandas", "version": "0.9.0"},
-        }
-
-        if partition:
-            # bug in dask-geopandas https://github.com/geopandas/dask-geopandas/issues/94
-            expected_geo_arrow_metadata["columns"]["geometry"]["bbox"] = [
-                -180.0,
-                -55.61183,
-                180.00000000000006,
-                83.64513000000001,
-            ]
-
-        assert (
-            result.properties["table:geo_arrow_metadata"] == expected_geo_arrow_metadata
-        )
-
         asset = result.assets["data"]
         assert asset.href == ds
         assert asset.media_type == "application/x-parquet"
-        if partition:
-            assert asset.roles == ["data", "root"]
-        else:
-            assert asset.roles == ["data"]
+        assert asset.roles == ["data"]
+
+        assert pystac.extensions.projection.SCHEMA_URI in result.stac_extensions
+        assert result.properties["proj:epsg"] == 4326
 
     def test_infer_bbox(self):
         df = geopandas.GeoDataFrame(
             {"A": [1, 2]},
             geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
+            crs=4326,
         )
         df.to_parquet("data.parquet")
         item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
         result = stac_table.generate("data.parquet", item, infer_bbox=True)
 
         assert result.bbox == (1.0, 2.0, 2.0, 3.0)
+        assert result.properties["proj:epsg"] == 4326
+        assert result.properties["proj:bbox"] == (1.0, 2.0, 2.0, 3.0)
 
     def test_infer_geometry(self):
         df = geopandas.GeoDataFrame(
             {"A": [1, 2]},
             geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
+            crs=4326,  # TODO: other epsg
         )
         df.to_parquet("data.parquet")
         item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
         result = stac_table.generate("data.parquet", item, infer_geometry=True)
+        expected = {"type": "MultiPoint", "coordinates": ((1.0, 2.0), (2.0, 3.0))}
 
-        assert result.geometry == {
-            "type": "MultiPoint",
-            "coordinates": ((1.0, 2.0), (2.0, 3.0)),
-        }
+        assert result.geometry == expected
+        assert result.properties["proj:epsg"] == 4326
+        assert result.properties["proj:geometry"] == expected
 
     def test_infer_datetime_midpoint(self):
         df = geopandas.GeoDataFrame(

@@ -11,20 +11,8 @@ import pandas as pd
 
 
 def main():
-    url = "abfs://gbif/occurrence/2021-08-01/occurrence.parquet/"
+    url = "abfs://gbif/occurrence/2021-08-01/occurrence.parquet"
     storage_options = {"account_name": "ai4edataeuwest"}
-    geo_arrow_metadata = {
-        "primary_column": "geometry",
-        "columns": {
-            "geometry": {
-                "crs": None,
-                "encoding": "WKB",
-                "bbox": [-179.966667, -84.5833, 179.192, 78.95],
-            }
-        },
-        "schema_version": "0.1.0",
-        "creator": {"library": "geopandas", "version": "0.9.0"},
-    }
     item = pystac.Item(
         "gbif-2021-08-01",
         geometry=None,
@@ -33,12 +21,7 @@ def main():
         properties={},
     )
 
-    result = stac_table.generate(
-        url,
-        item,
-        storage_options=storage_options,
-        geo_arrow_metadata=geo_arrow_metadata,
-    )
+    result = stac_table.generate(url, item, storage_options=storage_options, proj=False)
 
     # Add in the descriptions
     descriptions = (
@@ -49,6 +32,9 @@ def main():
         .set_index("field")["description"]
         .to_dict()
     )
+
+    # Add in the storage options
+    # TODO: move this from xarray-assets to fsspec-assets. Store it on the asset?
 
     for column in result.properties["table:columns"]:
         column["description"] = descriptions[column["name"]]
@@ -71,11 +57,8 @@ def main():
         ),
     )
     collection.extra_fields["table:columns"] = result.properties["table:columns"]
-    collection.extra_fields["table:geo_arrow_metadata"] = result.properties[
-        "table:geo_arrow_metadata"
-    ]
 
-    with open("catalog.json", "w") as f:
+    with open("collection.json", "w") as f:
         json.dump(collection.to_dict(), f, indent=2)
 
 
