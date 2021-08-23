@@ -1,0 +1,392 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "plot",
+  "properties": {
+    "table:columns": [
+      {
+        "name": "CN",
+        "type": "int64",
+        "description": "Sequence number"
+      },
+      {
+        "name": "SRV_CN",
+        "type": "int64",
+        "description": "Survey sequence number"
+      },
+      {
+        "name": "CTY_CN",
+        "type": "int64",
+        "description": "County sequence number"
+      },
+      {
+        "name": "PREV_PLT_CN",
+        "type": "double",
+        "description": "Previous plot sequence number"
+      },
+      {
+        "name": "INVYR",
+        "type": "int64",
+        "description": "Inventory year"
+      },
+      {
+        "name": "STATECD",
+        "type": "int64",
+        "description": "State code"
+      },
+      {
+        "name": "UNITCD",
+        "type": "int64",
+        "description": "Survey unit code"
+      },
+      {
+        "name": "COUNTYCD",
+        "type": "int64",
+        "description": "County code"
+      },
+      {
+        "name": "PLOT",
+        "type": "int64",
+        "description": "Plot number"
+      },
+      {
+        "name": "PLOT_STATUS_CD",
+        "type": "double",
+        "description": "Plot status code"
+      },
+      {
+        "name": "PLOT_NONSAMPLE_REASN_CD",
+        "type": "double",
+        "description": "Plot nonsampled reason code"
+      },
+      {
+        "name": "MEASYEAR",
+        "type": "double",
+        "description": "Measurement year"
+      },
+      {
+        "name": "MEASMON",
+        "type": "double",
+        "description": "Measurement month"
+      },
+      {
+        "name": "MEASDAY",
+        "type": "double",
+        "description": "Measurement day"
+      },
+      {
+        "name": "REMPER",
+        "type": "double",
+        "description": "Remeasurement period"
+      },
+      {
+        "name": "KINDCD",
+        "type": "int64",
+        "description": "Sample kind code"
+      },
+      {
+        "name": "DESIGNCD",
+        "type": "int64",
+        "description": "Design code"
+      },
+      {
+        "name": "RDDISTCD",
+        "type": "double",
+        "description": "Horizontal distance to improved road code"
+      },
+      {
+        "name": "WATERCD",
+        "type": "double",
+        "description": "Water on plot code"
+      },
+      {
+        "name": "LAT",
+        "type": "double",
+        "description": "Latitude"
+      },
+      {
+        "name": "LON",
+        "type": "double",
+        "description": "Longitude"
+      },
+      {
+        "name": "ELEV",
+        "type": "double",
+        "description": "Elevation"
+      },
+      {
+        "name": "GROW_TYP_CD",
+        "type": "double",
+        "description": "Type of annual volume growth code"
+      },
+      {
+        "name": "MORT_TYP_CD",
+        "type": "double",
+        "description": "Type of annual mortality volume code"
+      },
+      {
+        "name": "P2PANEL",
+        "type": "double",
+        "description": "Phase 2 panel number"
+      },
+      {
+        "name": "P3PANEL",
+        "type": "double",
+        "description": "Phase 3 panel number"
+      },
+      {
+        "name": "ECOSUBCD",
+        "type": "byte_array",
+        "description": "Ecological subsection code"
+      },
+      {
+        "name": "CONGCD",
+        "type": "double",
+        "description": "Congressional district code"
+      },
+      {
+        "name": "MANUAL",
+        "type": "double",
+        "description": "Manual (field guide) version number"
+      },
+      {
+        "name": "KINDCD_NC",
+        "type": "double",
+        "description": "Sample kind code, North Central"
+      },
+      {
+        "name": "QA_STATUS",
+        "type": "double",
+        "description": "Quality assurance status"
+      },
+      {
+        "name": "CREATED_BY",
+        "type": "double",
+        "description": "Created by"
+      },
+      {
+        "name": "CREATED_DATE",
+        "type": "byte_array",
+        "description": "Created date"
+      },
+      {
+        "name": "CREATED_IN_INSTANCE",
+        "type": "int64",
+        "description": "Created in instance"
+      },
+      {
+        "name": "MODIFIED_BY",
+        "type": "double",
+        "description": "Modified by"
+      },
+      {
+        "name": "MODIFIED_DATE",
+        "type": "byte_array",
+        "description": "Modified date"
+      },
+      {
+        "name": "MODIFIED_IN_INSTANCE",
+        "type": "int64",
+        "description": "Modified in instance"
+      },
+      {
+        "name": "MICROPLOT_LOC",
+        "type": "byte_array",
+        "description": "Microplot location"
+      },
+      {
+        "name": "DECLINATION",
+        "type": "double",
+        "description": "Declination"
+      },
+      {
+        "name": "EMAP_HEX",
+        "type": "double",
+        "description": "EMAP hexagon"
+      },
+      {
+        "name": "SAMP_METHOD_CD",
+        "type": "int64",
+        "description": "Sample method code"
+      },
+      {
+        "name": "SUBP_EXAMINE_CD",
+        "type": "int64",
+        "description": "Subplots examined code"
+      },
+      {
+        "name": "MACRO_BREAKPOINT_DIA",
+        "type": "double",
+        "description": "Macroplot breakpoint diameter"
+      },
+      {
+        "name": "INTENSITY",
+        "type": "double",
+        "description": "Intensity"
+      },
+      {
+        "name": "CYCLE",
+        "type": "int64",
+        "description": "Inventory cycle number"
+      },
+      {
+        "name": "SUBCYCLE",
+        "type": "double",
+        "description": "Inventory subcycle number"
+      },
+      {
+        "name": "ECO_UNIT_PNW",
+        "type": "byte_array",
+        "description": "Ecological unit, Pacific Northwest Research Station"
+      },
+      {
+        "name": "TOPO_POSITION_PNW",
+        "type": "double",
+        "description": "Topographic position, Pacific Northwest Research Station"
+      },
+      {
+        "name": "NF_SAMPLING_STATUS_CD",
+        "type": "double",
+        "description": "Nonforest sampling status code"
+      },
+      {
+        "name": "NF_PLOT_STATUS_CD",
+        "type": "double",
+        "description": "Nonforest plot status code"
+      },
+      {
+        "name": "NF_PLOT_NONSAMPLE_REASN_CD",
+        "type": "double",
+        "description": "Nonforest plot nonsampled reason code"
+      },
+      {
+        "name": "P2VEG_SAMPLING_STATUS_CD",
+        "type": "double",
+        "description": "P2 vegetation sampling status code"
+      },
+      {
+        "name": "P2VEG_SAMPLING_LEVEL_DETAIL_CD",
+        "type": "double",
+        "description": "P2 vegetation sampling level detail code"
+      },
+      {
+        "name": "INVASIVE_SAMPLING_STATUS_CD",
+        "type": "double",
+        "description": "Invasive sampling status code"
+      },
+      {
+        "name": "INVASIVE_SPECIMEN_RULE_CD",
+        "type": "double",
+        "description": "Invasive specimen rule code"
+      },
+      {
+        "name": "DESIGNCD_P2A",
+        "type": "double",
+        "description": "Design code periodic to annual"
+      },
+      {
+        "name": "MANUAL_DB",
+        "type": "double",
+        "description": "Manual version of the data"
+      },
+      {
+        "name": "SUBPANEL",
+        "type": "double",
+        "description": "Subpanel"
+      },
+      {
+        "name": "COLOCATED_CD_RMRS",
+        "type": "double",
+        "description": "Accounting co-located code, Rocky Mountain Research Station"
+      },
+      {
+        "name": "CONDCHNGCD_RMRS",
+        "type": "double",
+        "description": "Condition class change code, Rocky Mountain Research Station"
+      },
+      {
+        "name": "FUTFORCD_RMRS",
+        "type": "double",
+        "description": "Future forest potential code, Rocky Mountain Research Station"
+      },
+      {
+        "name": "MANUAL_NCRS",
+        "type": "double",
+        "description": "Manual (field guide) version number, North Central Research Station"
+      },
+      {
+        "name": "MANUAL_NERS",
+        "type": "double",
+        "description": "Manual (field guide) version number, Northeastern Research Station"
+      },
+      {
+        "name": "MANUAL_RMRS",
+        "type": "double",
+        "description": "Manual (field guide) version number, Rocky Mountain Research Station"
+      },
+      {
+        "name": "PAC_ISLAND_PNWRS",
+        "type": "byte_array",
+        "description": "Pacific Island name (Pacific Islands), Pacific Northwest Research Station"
+      },
+      {
+        "name": "PLOT_SEASON_NERS",
+        "type": "double",
+        "description": "Plot accessible season, Northeastern Research Station"
+      },
+      {
+        "name": "PRECIPITATION",
+        "type": "double",
+        "description": "Precipitation"
+      },
+      {
+        "name": "PREV_MICROPLOT_LOC_RMRS",
+        "type": "byte_array",
+        "description": "Previous microplot location, Rocky Mountain Research Station"
+      },
+      {
+        "name": "PREV_PLOT_STATUS_CD_RMRS",
+        "type": "double",
+        "description": "Previous plot status code, Rocky Mountain Research Station"
+      },
+      {
+        "name": "REUSECD1",
+        "type": "double",
+        "description": "Recreation use code 1 (Pacific Islands)"
+      },
+      {
+        "name": "REUSECD2",
+        "type": "double",
+        "description": "Recreation use code 2 (Pacific Islands)"
+      },
+      {
+        "name": "REUSECD3",
+        "type": "double",
+        "description": "Recreation use code 3 (Pacific Islands)"
+      }
+    ],
+    "datetime": "2020-06-01T00:00:00Z"
+  },
+  "geometry": null,
+  "links": [],
+  "assets": {
+    "data": {
+      "href": "abfs://cpdata/raw/fia/plot.parquet",
+      "type": "application/x-parquet",
+      "title": "Dataset root",
+      "account_name": "cpdataeuwest",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "bbox": [
+    -179.14734,
+    -14.53,
+    179.77847,
+    71.352561
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/table/v1.0.0/schema.json"
+  ]
+}
