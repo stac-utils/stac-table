@@ -264,7 +264,9 @@
       "href": "abfs://gbif/occurrence/2021-08-01/occurrence.parquet",
       "type": "application/x-parquet",
       "title": "Dataset root",
-      "account_name": "ai4edataeuwest",
+      "table:storage_options": {
+        "account_name": "ai4edataeuwest"
+      },
       "roles": [
         "data"
       ]

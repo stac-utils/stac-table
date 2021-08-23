@@ -374,7 +374,9 @@
       "href": "abfs://cpdata/raw/fia/plot.parquet",
       "type": "application/x-parquet",
       "title": "Dataset root",
-      "account_name": "cpdataeuwest",
+      "table:storage_options": {
+        "account_name": "cpdataeuwest"
+      },
       "roles": [
         "data"
       ]
