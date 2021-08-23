@@ -292,13 +292,21 @@ def main():
                 [[datetime.datetime(2020, 6, 1), None]]
             ),
         ),
+        license="CC0-1.0",
     )
     collection.title = "Forest Inventory and Analysis"
     # TODO: Update when the table extension is published.
     # collection.stac_extensions.append(
     #     "https://stac-extensions.github.io/table/v1.0.0/schema.json"
     # )
-    collection.keywords = ["forest"]
+    collection.keywords = [
+        "Forest",
+        "Species",
+        "Carbon",
+        "Biomass",
+        "USDA",
+        "Forest Service",
+    ]
     collection.extra_fields["table:tables"] = table_tables
     collection.extra_fields[
         "msft:short_description"
@@ -327,11 +335,20 @@ def main():
     ]
     collection.assets["thumbnail"] = pystac.Asset(
         title="Forest Inventory and Analysis",
-        href="https://camo.githubusercontent.com/40dc57a0d4f7a365af940e1ce43b419dc12b173eea645907c28e2a2a50267324/68747470733a2f2f6c6162732e676269662e6f72672f7e6d626c6973736574742f323031392f31302f616e616c79746963732d6d6170732f776f726c642d323032312d30312d30312e706e67",
-        media_type="image/png",
+        href="https://www.fia.fs.fed.us/library/maps/docs/USForest_fullview.gif",
+        media_type="image/gif",
     )
 
-    collection.clear_links()  # TODO: Find the terms of use.
+    # https://data.nal.usda.gov/dataset/forest-inventory-and-analysis-database-0 is helpful.
+    collection.links = [
+        pystac.Link(
+            pystac.RelType.LICENSE,
+            target="https://creativecommons.org/publicdomain/zero/1.0/",
+            media_type="text/html",
+            title="License",
+        )
+    ]
+
     with open("collection.json", "w") as f:
         json.dump(collection.to_dict(), f, indent=2)
 
