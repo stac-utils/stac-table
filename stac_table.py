@@ -156,8 +156,9 @@ def generate(
         proj = get_proj(data)
     proj = proj or {}
 
-    if SCHEMA_URI not in template.stac_extensions:
-        template.stac_extensions.append(SCHEMA_URI)
+    # TODO: Add schema when published
+    # if SCHEMA_URI not in template.stac_extensions:
+    #     template.stac_extensions.append(SCHEMA_URI)
     if proj and pystac.extensions.projection.SCHEMA_URI not in template.stac_extensions:
         template.stac_extensions.append(pystac.extensions.projection.SCHEMA_URI)
 

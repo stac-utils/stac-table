@@ -9,49 +9,78 @@ import stac_table
 import datetime
 import pystac
 from pathlib import Path
+import adlfs
 
 
 def main():
-    url = "abfs://gbif/occurrence/2021-08-01/occurrence.parquet"
+    fs = adlfs.AzureBlobFileSystem("ai4edataeuwest")
+    dates = fs.ls("gbif/occurrence")
     storage_options = {"account_name": "ai4edataeuwest"}
-    item = pystac.Item(
-        "gbif-2021-08-01",
-        geometry=None,
-        bbox=(-180, -90, 180, 90),
-        datetime=datetime.datetime(2021, 8, 1),  # snapshot date seems most useful?
-        properties={},
-    )
+    items = []
 
-    result = stac_table.generate(
-        url,
-        item,
-        storage_options=storage_options,
-        proj=False,
-        asset_extra_fields=storage_options,
-    )
-    description = Path("description.md").read_text()
-    xpr = re.compile(
-        r"^\|\s*(\w*?)\s*\| \w.*?\|.*?\|\s*(.*?)\s*\|$", re.UNICODE | re.MULTILINE
-    )
-    column_descriptions = dict(xpr.findall(Path("column_descriptions.md").read_text()))
+    for path in dates:
+        date = datetime.datetime(*list(map(int, path.split("/")[-1].split("-"))))
 
-    # Add in the storage options
-    # TODO: move this from xarray-assets to fsspec-assets. Store it on the asset?
+        item = pystac.Item(
+            "gbif-2021-08-01",
+            geometry={
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [180.0, -90.0],
+                        [180.0, 90.0],
+                        [-180.0, 90.0],
+                        [-180.0, -90.0],
+                        [180.0, -90.0],
+                    ]
+                ],
+            },
+            bbox=[-180, -90, 180, 90],
+            datetime=date,  # snapshot date seems most useful?
+            properties={},
+        )
 
-    for column in result.properties["table:columns"]:
-        column["description"] = column_descriptions[column["name"]]
+        result = stac_table.generate(
+            f"abfs://gbif/occurrence/{date:%Y-%m-%d}/occurrence.parquet",
+            item,
+            storage_options=storage_options,
+            proj=False,
+            asset_extra_fields=storage_options,
+        )
+        xpr = re.compile(
+            r"^\|\s*(\w*?)\s*\| \w.*?\|.*?\|\s*(.*?)\s*\|$", re.UNICODE | re.MULTILINE
+        )
+        column_descriptions = dict(
+            xpr.findall(Path("column_descriptions.md").read_text())
+        )
+
+        # Add in the storage options
+        # TODO: move this from xarray-assets to fsspec-assets. Store it on the asset?
+
+        for column in result.properties["table:columns"]:
+            column["description"] = column_descriptions[column["name"]]
+
+        result.validate()
+        items.append(result)
+
+    with open("items.ndjson", "w") as f:
+        for item in items:
+            json.dump(item.to_dict(), f)
+            f.write("\n")
 
     with open("item.json", "w") as f:
-        json.dump(result.to_dict(), f, indent=2)
+        json.dump(items[-1].to_dict(), f, indent=2)
 
+    dates = [
+        datetime.datetime(*list(map(int, dates[0].split("/")[-1].split("-")))),
+        datetime.datetime(*list(map(int, dates[-1].split("/")[-1].split("-")))),
+    ]
     collection = pystac.Collection(
         "gbif",
         description="{{ collection.description }}",
         extent=pystac.Extent(
             spatial=pystac.collection.SpatialExtent([[-180, -90, 180, 90]]),
-            temporal=pystac.collection.TemporalExtent(
-                [[datetime.datetime(2021, 8, 1), None]]
-            ),
+            temporal=pystac.collection.TemporalExtent([dates]),
         ),
     )
     collection.extra_fields["table:columns"] = result.properties["table:columns"]

@@ -257,7 +257,33 @@
     ],
     "datetime": "2021-08-01T00:00:00Z"
   },
-  "geometry": null,
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          180.0,
+          -90.0
+        ],
+        [
+          180.0,
+          90.0
+        ],
+        [
+          -180.0,
+          90.0
+        ],
+        [
+          -180.0,
+          -90.0
+        ],
+        [
+          180.0,
+          -90.0
+        ]
+      ]
+    ]
+  },
   "links": [],
   "assets": {
     "data": {
@@ -278,7 +304,5 @@
     180,
     90
   ],
-  "stac_extensions": [
-    "https://stac-extensions.github.io/table/v1.0.0/schema.json"
-  ]
+  "stac_extensions": []
 }
