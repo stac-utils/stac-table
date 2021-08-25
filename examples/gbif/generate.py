@@ -5,7 +5,7 @@ Requires `adlfs` and `lxml` in addition to the other packages.
 
 The files can be uploaded with, e.g.
 
-$ azcopy copy items.ndjson 'https://ai4edataeuwest.blob.core.windows.net/gbif-stac/items.ndjson'
+$ azcopy copy items 'https://ai4edataeuwest.blob.core.windows.net/gbif-stac' --recursive
 """
 import re
 import json
@@ -21,12 +21,15 @@ def main():
     dates = fs.ls("gbif/occurrence")
     storage_options = {"account_name": "ai4edataeuwest"}
     items = []
+    p = Path("items")
+    p.mkdir(exist_ok=True)
 
     for path in dates:
         date = datetime.datetime(*list(map(int, path.split("/")[-1].split("-"))))
+        date_id = f"{date:%Y-%m-%d}"
 
         item = pystac.Item(
-            "gbif-2021-08-01",
+            f"gbif-{date_id}",
             geometry={
                 "type": "Polygon",
                 "coordinates": [
@@ -45,7 +48,7 @@ def main():
         )
 
         result = stac_table.generate(
-            f"abfs://gbif/occurrence/{date:%Y-%m-%d}/occurrence.parquet",
+            f"abfs://gbif/occurrence/{date_id}/occurrence.parquet",
             item,
             storage_options=storage_options,
             proj=False,
@@ -65,15 +68,8 @@ def main():
             column["description"] = column_descriptions[column["name"]]
 
         result.validate()
-        items.append(result)
-
-    with open("items.ndjson", "w") as f:
-        for item in items:
-            json.dump(item.to_dict(), f)
-            f.write("\n")
-
-    with open("item.json", "w") as f:
-        json.dump(items[-1].to_dict(), f, indent=2)
+        with open(p.joinpath(item.id + ".json"), "w") as f:
+            json.dump(result.to_dict(), f)
 
     dates = [
         datetime.datetime(*list(map(int, dates[0].split("/")[-1].split("-")))),
