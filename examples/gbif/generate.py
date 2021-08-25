@@ -2,6 +2,10 @@
 Generates a STAC Collection and item for GBIF, using the parquet files on Azure: http://aka.ms/ai4edata-gbif.
 
 Requires `adlfs` and `lxml` in addition to the other packages.
+
+The files can be uploaded with, e.g.
+
+$ azcopy copy items.ndjson 'https://ai4edataeuwest.blob.core.windows.net/gbif-stac/items.ndjson'
 """
 import re
 import json
