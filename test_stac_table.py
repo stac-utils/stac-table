@@ -54,8 +54,6 @@ class TestItem:
             {"name": "gdp_md_est", "type": "double"},
             {"name": "geometry", "type": "byte_array"},
         ]
-        if partition:
-            expected_columns.append({"name": "__null_dask_index__", "type": "int64"})
         assert result.properties["table:columns"] == expected_columns
 
         asset = result.assets["data"]
