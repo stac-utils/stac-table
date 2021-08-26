@@ -25,6 +25,7 @@ def main():
     p.mkdir(exist_ok=True)
 
     for path in dates:
+        print("processing", path)
         date = datetime.datetime(*list(map(int, path.split("/")[-1].split("-"))))
         date_id = f"{date:%Y-%m-%d}"
 
@@ -53,6 +54,7 @@ def main():
             storage_options=storage_options,
             proj=False,
             asset_extra_fields=storage_options,
+            count_rows=False,
         )
         xpr = re.compile(
             r"^\|\s*(\w*?)\s*\| \w.*?\|.*?\|\s*(.*?)\s*\|$", re.UNICODE | re.MULTILINE
@@ -114,7 +116,7 @@ def main():
     ]
     collection.assets["thumbnail"] = pystac.Asset(
         title="Forest Inventory and Analysis",
-        href="https://camo.githubusercontent.com/40dc57a0d4f7a365af940e1ce43b419dc12b173eea645907c28e2a2a50267324/68747470733a2f2f6c6162732e676269662e6f72672f7e6d626c6973736574742f323031392f31302f616e616c79746963732d6d6170732f776f726c642d323032312d30312d30312e706e67",
+        href="https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/gbif.png",
         media_type="image/png",
     )
     collection.links = [
