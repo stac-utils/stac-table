@@ -44,7 +44,11 @@ class TestItem:
 
         item = pystac.Item("naturalearth_lowres", geometry, bbox, "2021-01-01", {})
         ds = str(Path("data.parquet").absolute())
-        result = stac_table.generate(ds, item)
+        result = stac_table.generate(
+            ds,
+            item,
+            asset_extra_fields={"table:storage_options": {"storage_account": "foo"}},
+        )
 
         expected_columns = [
             {"name": "pop_est", "type": "int64"},
@@ -60,6 +64,7 @@ class TestItem:
         assert asset.href == ds
         assert asset.media_type == "application/x-parquet"
         assert asset.roles == ["data"]
+        assert asset.extra_fields["table:storage_options"] == {"storage_account": "foo"}
 
         assert pystac.extensions.projection.SCHEMA_URI in result.stac_extensions
         assert result.properties["proj:epsg"] == 4326

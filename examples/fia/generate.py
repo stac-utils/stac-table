@@ -202,7 +202,7 @@ def main():
             uri,
             item,
             storage_options=storage_options,
-            asset_extra_fields=storage_options,
+            asset_extra_fields={"table:storage_options": storage_options},
             proj=False,
         )
         result.properties["table:columns"] = [

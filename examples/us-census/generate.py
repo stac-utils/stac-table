@@ -172,7 +172,7 @@ def main():
     fs = adlfs.AzureBlobFileSystem("ai4edataeuwest", credential=AZURE_SAS_TOKEN)
     datasets = fs.ls("us-census/2020")
     storage_options = {"account_name": "ai4edataeuwest", "credential": AZURE_SAS_TOKEN}
-    asset_extra_fields = {"account_name": "ai4edataeuwest"}
+    asset_extra_fields = {"table:storage_options": {"account_name": "ai4edataeuwest"}}
 
     p = Path("items")
     p.mkdir(exist_ok=True)

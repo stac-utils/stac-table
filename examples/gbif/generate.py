@@ -53,7 +53,7 @@ def main():
             item,
             storage_options=storage_options,
             proj=False,
-            asset_extra_fields=storage_options,
+            asset_extra_fields={"table:storage_options": storage_options},
             count_rows=False,
         )
         xpr = re.compile(

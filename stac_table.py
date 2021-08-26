@@ -214,7 +214,8 @@ def generate(
             title="Dataset root",
             media_type=PARQUET_MEDIA_TYPE,
             roles=["data"],
-            extra_fields={"table:storage_options": asset_extra_fields},
+            # extra_fields={"table:storage_options": asset_extra_fields},
+            extra_fields=asset_extra_fields,
         )
         template.add_asset(asset_key, asset)
 
