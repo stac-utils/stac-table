@@ -38,6 +38,7 @@ def generate(
     infer_geometry=False,
     datetime_column=None,
     infer_datetime=InferDatetimeOptions.no,
+    count_rows=True,
     asset_key="data",
     asset_extra_fields=None,
     proj=True,
@@ -75,6 +76,9 @@ def generate(
         - midpoint : Set `datetime` to the midpoint of the highest and lowest values.
         - unique : Set `datetime` to the unique value. Raises if more than one unique value is found.
         - range : Set `start_datetime` and `end_datetime` to the minimum and maximum values.
+
+    count_rows : bool, default True
+        Whether to add the row count to `table:row_count`.
 
     asset_key : str, default "data"
         The asset key to use for the parquet dataset. The href will be the ``uri`` and
@@ -198,6 +202,11 @@ def generate(
         values = list(pd.Series(values).dt.to_pydatetime())
         template.properties["start_datetime"] = values[0]
         template.properties["end_datetime"] = values[1]
+
+    if count_rows:
+        template.properties["table:row_count"] = sum(
+            x.count_rows() for x in ds.fragments
+        )
 
     if asset_key:
         asset = pystac.asset.Asset(
