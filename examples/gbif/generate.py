@@ -87,8 +87,6 @@ def main():
     )
     collection.extra_fields["table:columns"] = result.properties["table:columns"]
     collection.title = "Global Biodiversity Information Facility (GBIF)"
-    # TODO: Add table extension.
-    # Blocked until we have this published officially.
     collection.stac_extensions.append(stac_table.SCHEMA_URI)
     collection.keywords = ["GBIF", "Biodiversity", "Species"]
     collection.extra_fields[

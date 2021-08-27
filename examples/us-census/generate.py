@@ -187,7 +187,7 @@ def main():
 
     for dataset in datasets:
         if Path(dataset).stem not in table_descriptions:
-            rich.print(["[red]Skipping[/red]", dataset])
+            rich.print(f"[red]Skipping[/red] {dataset}")
             continue
         column_slice = table_descriptions[Path(dataset).stem][2]
         if column_slice:
@@ -242,12 +242,9 @@ def main():
     ]
 
     collection.title = "US Census"
-    # TODO: Add table extension.
-    # Blocked until we have this published officially.
-    # collection.stac_extensions.append(
-    #     "https://stac-extensions.github.io/table/v1.0.0/schema.json"
-    # )
+    collection.stac_extensions.append(stac_table.SCHEMA_URI)
     collection.keywords = ["US Census Bureau", "Administrative boundaries"]
+    collection.extra_fields["table:columns"] = []  # Seems required unfortunately.
     collection.extra_fields["table:tables"] = table_tables
     collection.extra_fields[
         "msft:short_description"
