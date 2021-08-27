@@ -19,6 +19,7 @@ import shapely.geometry
 
 
 T = TypeVar("T", pystac.Collection, pystac.Item)
+# SCHEMA_URI = "https://stac-extensions.github.io/table/v1.0.0/schema.json"
 SCHEMA_URI = "https://stac-extensions.github.io/table/v1.0.0/schema.json"
 # https://issues.apache.org/jira/browse/PARQUET-1889: parquet doesn't officially have a type yet.
 PARQUET_MEDIA_TYPE = "application/x-parquet"
@@ -161,8 +162,8 @@ def generate(
     proj = proj or {}
 
     # TODO: Add schema when published
-    # if SCHEMA_URI not in template.stac_extensions:
-    #     template.stac_extensions.append(SCHEMA_URI)
+    if SCHEMA_URI not in template.stac_extensions:
+        template.stac_extensions.append(SCHEMA_URI)
     if proj and pystac.extensions.projection.SCHEMA_URI not in template.stac_extensions:
         template.stac_extensions.append(pystac.extensions.projection.SCHEMA_URI)
 
