@@ -11,7 +11,10 @@
       "title": "License"
     }
   ],
-  "stac_extensions": [],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/table/v1.0.0/schema.json"
+  ],
+  "table:columns": [],
   "table:tables": [
     {
       "name": "Survey Table",

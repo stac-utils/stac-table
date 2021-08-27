@@ -154,6 +154,8 @@ def main():
         if any(list(x.columns) == column_set for column_set in column_sets)
     ]
     storage_options = {"account_name": "cpdataeuwest"}
+    items = Path("items")
+    items.mkdir(exist_ok=True)
 
     for table_name, subsection in table_subsections:
         # if Path(f"{table_name}.json").exists():
@@ -204,6 +206,7 @@ def main():
             storage_options=storage_options,
             asset_extra_fields={"table:storage_options": storage_options},
             proj=False,
+            count_rows=False,
         )
         result.properties["table:columns"] = [
             x
@@ -218,7 +221,7 @@ def main():
             else:
                 print(f"Missing description for {table_name}.{column['name']}")
 
-        with open(f"{table_name}.json", "w") as f:
+        with open(items.joinpath(f"{table_name}.json"), "w") as f:
             json.dump(result.to_dict(), f, indent=2)
         print(f"wrote {table_name}.json")
 
@@ -295,10 +298,7 @@ def main():
         license="CC0-1.0",
     )
     collection.title = "Forest Inventory and Analysis"
-    # TODO: Update when the table extension is published.
-    # collection.stac_extensions.append(
-    #     "https://stac-extensions.github.io/table/v1.0.0/schema.json"
-    # )
+    collection.stac_extensions.append(stac_table.SCHEMA_URI)
     collection.keywords = [
         "Forest",
         "Species",
@@ -307,6 +307,7 @@ def main():
         "USDA",
         "Forest Service",
     ]
+    collection.extra_fields["table:columns"] = []
     collection.extra_fields["table:tables"] = table_tables
     collection.extra_fields[
         "msft:short_description"
