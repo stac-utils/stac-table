@@ -242,7 +242,17 @@ def main():
     ]
 
     collection.title = "US Census"
+    pystac.extensions.item_assets.ItemAssetsExtension.add_to(collection)
     collection.stac_extensions.append(stac_table.SCHEMA_URI)
+    collection.extra_fields["item_assets"] = {
+        "data": {
+            "type": stac_table.PARQUET_MEDIA_TYPE,
+            "title": "Dataset root",
+            "roles": ["data"],
+            **asset_extra_fields,
+        }
+    }
+
     collection.keywords = ["US Census Bureau", "Administrative boundaries"]
     collection.extra_fields["table:columns"] = []  # Seems required unfortunately.
     collection.extra_fields["table:tables"] = table_tables
