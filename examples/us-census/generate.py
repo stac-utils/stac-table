@@ -254,7 +254,6 @@ def main():
     }
 
     collection.keywords = ["US Census Bureau", "Administrative boundaries"]
-    collection.extra_fields["table:columns"] = []  # Seems required unfortunately.
     collection.extra_fields["table:tables"] = table_tables
     collection.extra_fields[
         "msft:short_description"

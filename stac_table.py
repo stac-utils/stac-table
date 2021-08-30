@@ -19,8 +19,7 @@ import shapely.geometry
 
 
 T = TypeVar("T", pystac.Collection, pystac.Item)
-# SCHEMA_URI = "https://stac-extensions.github.io/table/v1.0.0/schema.json"
-SCHEMA_URI = "https://stac-extensions.github.io/table/v1.0.0/schema.json"
+SCHEMA_URI = "https://stac-extensions.github.io/table/v1.2.0/schema.json"
 # https://issues.apache.org/jira/browse/PARQUET-1889: parquet doesn't officially have a type yet.
 PARQUET_MEDIA_TYPE = "application/x-parquet"
 
