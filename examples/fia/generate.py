@@ -157,76 +157,73 @@ def main():
     items = Path("items")
     items.mkdir(exist_ok=True)
 
-    for table_name, subsection in table_subsections:
-        # if Path(f"{table_name}.json").exists():
-        #     continue
-        column_description = (
-            pd.concat(
-                [
-                    x
-                    for x in column_descriptions
-                    if x["Subsection"].str.startswith(subsection + ".").all()
-                ]
-            )
-            .iloc[:, [1, 2]]
-            .dropna()
-        )
-        if table_name == "boundary":
-            d = boundary_column_descriptions
-        else:
-            d = (
-                column_description.set_index(column_description.iloc[:, 0])[
-                    "Descriptive name"
-                ]
-                .str.replace("\r", " ")
-                .dropna()
-                .rename(lambda x: x.replace("\r", ""))
-                .to_dict()
-            )
+    # for table_name, subsection in table_subsections:
+    #     # if Path(f"{table_name}.json").exists():
+    #     #     continue
+    #     column_description = (
+    #         pd.concat(
+    #             [
+    #                 x
+    #                 for x in column_descriptions
+    #                 if x["Subsection"].str.startswith(subsection + ".").all()
+    #             ]
+    #         )
+    #         .iloc[:, [1, 2]]
+    #         .dropna()
+    #     )
+    #     if table_name == "boundary":
+    #         d = boundary_column_descriptions
+    #     else:
+    #         d = (
+    #             column_description.set_index(column_description.iloc[:, 0])[
+    #                 "Descriptive name"
+    #             ]
+    #             .str.replace("\r", " ")
+    #             .dropna()
+    #             .rename(lambda x: x.replace("\r", ""))
+    #             .to_dict()
+    #         )
 
-        uri = f"abfs://cpdata/raw/fia/{table_name}.parquet"
-        df = dd.read_parquet(uri, storage_options=storage_options)
+    #     uri = f"abfs://cpdata/raw/fia/{table_name}.parquet"
+    #     df = dd.read_parquet(uri, storage_options=storage_options)
 
-        result = list(d)
-        expected = df.columns.tolist()
+    #     result = list(d)
+    #     expected = df.columns.tolist()
 
-        if result != expected:
-            print(f"Column mismatch for {table_name}!", set(result) ^ set(expected))
+    #     if result != expected:
+    #         print(f"Column mismatch for {table_name}!", set(result) ^ set(expected))
 
-        item = pystac.Item(
-            f"{table_name}",
-            geometry=None,
-            bbox=(-179.14734, -14.53, 179.77847, 71.352561),
-            datetime=datetime.datetime(2020, 6, 1),  # date accessed from FIA...
-            properties={},
-        )
-        result = stac_table.generate(
-            uri,
-            item,
-            storage_options=storage_options,
-            asset_extra_fields={"table:storage_options": storage_options},
-            proj=False,
-            count_rows=False,
-        )
-        result.properties["table:columns"] = [
-            x
-            for x in result.properties["table:columns"]
-            if x["name"] != "__null_dask_index__"
-        ]
+    #     item = pystac.Item(
+    #         f"{table_name}",
+    #         geometry=None,
+    #         bbox=(-179.14734, -14.53, 179.77847, 71.352561),
+    #         datetime=datetime.datetime(2020, 6, 1),  # date accessed from FIA...
+    #         properties={},
+    #     )
+    #     result = stac_table.generate(
+    #         uri,
+    #         item,
+    #         storage_options=storage_options,
+    #         asset_extra_fields={"table:storage_options": storage_options},
+    #         proj=False,
+    #         count_rows=False,
+    #     )
+    #     result.properties["table:columns"] = [
+    #         x
+    #         for x in result.properties["table:columns"]
+    #         if x["name"] != "__null_dask_index__"
+    #     ]
 
-        for column in result.properties["table:columns"]:
-            description = d.get(column["name"])
-            if description:
-                column["description"] = d[column["name"]]
-            else:
-                print(f"Missing description for {table_name}.{column['name']}")
+    #     for column in result.properties["table:columns"]:
+    #         description = d.get(column["name"])
+    #         if description:
+    #             column["description"] = d[column["name"]]
+    #         else:
+    #             print(f"Missing description for {table_name}.{column['name']}")
 
-        with open(items.joinpath(f"{table_name}.json"), "w") as f:
-            json.dump(result.to_dict(), f, indent=2)
-        print(f"wrote {table_name}.json")
-
-    with open("description.md", encoding="utf-8") as f:
-        collection_description = f.read()
+    #     with open(items.joinpath(f"{table_name}.json"), "w") as f:
+    #         json.dump(result.to_dict(), f, indent=2)
+    #     print(f"wrote {table_name}.json")
 
     # Handle the collection now.
     table_columns = ["Section", "Oracle table name", "Table name", "Description"]
@@ -239,7 +236,11 @@ def main():
                 "Oracle table name": lambda x: x["Oracle table name"]
                 .str.lower()
                 .str.replace("\r", ""),
-                "Description": lambda x: x["Description"].str.replace("\r", " "),
+                # the tables have inline unordered lists. We should be able to use a markdown list,
+                # but the planetary computer HTML catalog doesn't correctly convert that to HTML.
+                "Description": lambda x: x["Description"]
+                .str.replace("\r", " ")
+                .str.replace("\u2022", "<br><br>* "),
             }
         )
         .set_index(["Section", "Oracle table name"])
@@ -261,11 +262,11 @@ def main():
             description = boundary_table_description
             name = "boundary"
         else:
-            description = (
-                description.replace("\n", " ").replace("\r", " ")
-                if description
-                else description
-            )
+            # description = (
+            #     # description.replace("\n", " ").replace("\r", " ")
+            #     if description
+            #     else description
+            # )
             name = name or table_name
             name = name.replace("\r", " ")
         table_tables.append(
@@ -307,7 +308,6 @@ def main():
         "USDA",
         "Forest Service",
     ]
-    collection.extra_fields["table:columns"] = []
     collection.extra_fields["table:tables"] = table_tables
     collection.extra_fields[
         "msft:short_description"
@@ -336,8 +336,14 @@ def main():
     ]
     collection.assets["thumbnail"] = pystac.Asset(
         title="Forest Inventory and Analysis",
-        href="https://www.fia.fs.fed.us/library/maps/docs/USForest_fullview.gif",
+        href="https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/fia.png",
         media_type="image/gif",
+    )
+    collection.assets["guide"] = pystac.Asset(
+        title="Database Description and User Guide",
+        href="https://www.fia.fs.fed.us/library/database-documentation/current/ver80/FIADB%20User%20Guide%20P2_8-0.pdf",
+        media_type="application/pdf",
+        roles=["metadata"],
     )
 
     # https://data.nal.usda.gov/dataset/forest-inventory-and-analysis-database-0 is helpful.
