@@ -1,5 +1,4 @@
 import json
-import os
 import re
 import datetime
 import itertools
@@ -11,9 +10,9 @@ import stac_table
 import shapely.geometry
 import rich
 import dask_geopandas
+import planetary_computer
 
 
-AZURE_SAS_TOKEN = os.environ["AZURE_SAS_TOKEN"]
 table_descriptions = {
     "cb_2020_us_aiannh_500k": (
         "American Indian/Alaska Native Areas/Hawaiian Home Lands (AIANNH)",
@@ -169,9 +168,10 @@ table_descriptions = {
 
 
 def main():
-    fs = adlfs.AzureBlobFileSystem("ai4edataeuwest", credential=AZURE_SAS_TOKEN)
+    token = planetary_computer.sas.get_token("ai4edataeuwest", "us-census")
+    fs = adlfs.AzureBlobFileSystem("ai4edataeuwest", credential=token.token)
     datasets = fs.ls("us-census/2020")
-    storage_options = {"account_name": "ai4edataeuwest", "credential": AZURE_SAS_TOKEN}
+    storage_options = {"account_name": "ai4edataeuwest", "credential": token.token}
     asset_extra_fields = {"table:storage_options": {"account_name": "ai4edataeuwest"}}
 
     p = Path("items")
@@ -229,7 +229,18 @@ def main():
         extent=pystac.Extent(
             # spatial extent from the US Boundary file's bounds.
             spatial=pystac.collection.SpatialExtent(
-                [[-179.14733999999999, -14.552548999999999, 179.77847, 71.352561]]
+                [
+                    [-124.763068, 24.523096, -66.949895, 49.384358],
+                    [-179.148909, 51.214183, -129.974167, 71.365162],
+                    [172.461667, 51.357688, 179.77847, 53.01075],
+                    [-178.334698, 18.910361, -154.806773, 28.402123],
+                    [144.618068, 13.234189, 144.956712, 13.654383],
+                    [-67.945404, 17.88328, -65.220703, 18.515683],
+                    [144.886331, 14.110472, 146.064818, 20.553802],
+                    [-65.085452, 17.673976, -64.564907, 18.412655],
+                    [-171.089874, -14.548699, -168.1433, -11.046934],
+                    [-178.334698, 18.910361, -154.806773, 28.402123],
+                ]
             ),
             temporal=pystac.collection.TemporalExtent(
                 [datetime.datetime(2021, 8, 1), datetime.datetime(2021, 8, 1)]
