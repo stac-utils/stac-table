@@ -12,6 +12,7 @@
     }
   ],
   "stac_extensions": [
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
     "https://stac-extensions.github.io/table/v1.2.0/schema.json"
   ],
   "table:columns": [
@@ -266,6 +267,18 @@
       "description": "A list of [issues](https://gbif.github.io/gbif-api/apidocs/org/gbif/api/vocabulary/OccurrenceIssue.html) encountered by GBIF in processing this record. More details are available on these issues and flags in [this blog post](https://data-blog.gbif.org/post/issues-and-flags/)."
     }
   ],
+  "item_assets": {
+    "data": {
+      "type": "application/x-parquet",
+      "title": "Dataset root",
+      "roles": [
+        "data"
+      ],
+      "table:storage_options": {
+        "account_name": "ai4edataeuwest"
+      }
+    }
+  },
   "msft:short_description": "An international network and data infrastructure funded by the world's governments providing global data that document the occurrence of species.",
   "msft:container": "gbif",
   "msft:storage_account": "ai4edataeuwest",
@@ -285,7 +298,7 @@
       "interval": [
         [
           "2021-04-13T00:00:00Z",
-          "2021-08-01T00:00:00Z"
+          "2021-09-01T00:00:00Z"
         ]
       ]
     }

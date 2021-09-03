@@ -20,7 +20,7 @@ def main():
     fs = adlfs.AzureBlobFileSystem("ai4edataeuwest")
     dates = fs.ls("gbif/occurrence")
     storage_options = {"account_name": "ai4edataeuwest"}
-    items = []
+    asset_extra_fields = {"table:storage_options": storage_options}
     p = Path("items")
     p.mkdir(exist_ok=True)
 
@@ -53,7 +53,7 @@ def main():
             item,
             storage_options=storage_options,
             proj=False,
-            asset_extra_fields={"table:storage_options": storage_options},
+            asset_extra_fields=asset_extra_fields,
             count_rows=False,
         )
         xpr = re.compile(
@@ -87,6 +87,17 @@ def main():
     )
     collection.extra_fields["table:columns"] = result.properties["table:columns"]
     collection.title = "Global Biodiversity Information Facility (GBIF)"
+
+    pystac.extensions.item_assets.ItemAssetsExtension.add_to(collection)
+    collection.extra_fields["item_assets"] = {
+        "data": {
+            "type": stac_table.PARQUET_MEDIA_TYPE,
+            "title": "Dataset root",
+            "roles": ["data"],
+            **asset_extra_fields,
+        }
+    }
+
     collection.stac_extensions.append(stac_table.SCHEMA_URI)
     collection.keywords = ["GBIF", "Biodiversity", "Species"]
     collection.extra_fields[
