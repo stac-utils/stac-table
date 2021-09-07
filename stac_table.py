@@ -2,7 +2,6 @@
 Generate STAC Collections for tabular datasets.
 """
 __version__ = "1.0.0"
-import json
 import copy
 import enum
 from pathlib import Path
@@ -43,6 +42,7 @@ def generate(
     asset_extra_fields=None,
     proj=True,
     storage_options=None,
+    validate=True,
 ) -> T:
     """
     Generate a STAC Item from a Parquet Dataset.
@@ -99,6 +99,9 @@ def generate(
     storage_options: mapping, optional
         A dictionary of keywords to provide to :meth:`fsspec.get_fs_token_paths`
         when creating an fsspec filesystem with a str ``ds``.
+
+    validate : bool, default True
+        Whether to validate the returned pystac.Item.
 
     Returns
     -------
@@ -218,6 +221,9 @@ def generate(
             extra_fields=asset_extra_fields,
         )
         template.add_asset(asset_key, asset)
+
+    if validate:
+        template.validate()
 
     return template
 

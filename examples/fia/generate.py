@@ -6,6 +6,7 @@ import dask.dataframe as dd
 import pandas as pd
 import urllib.request
 from pathlib import Path
+import shapely.geometry
 import tabula
 
 
@@ -157,73 +158,75 @@ def main():
     items = Path("items")
     items.mkdir(exist_ok=True)
 
-    # for table_name, subsection in table_subsections:
-    #     # if Path(f"{table_name}.json").exists():
-    #     #     continue
-    #     column_description = (
-    #         pd.concat(
-    #             [
-    #                 x
-    #                 for x in column_descriptions
-    #                 if x["Subsection"].str.startswith(subsection + ".").all()
-    #             ]
-    #         )
-    #         .iloc[:, [1, 2]]
-    #         .dropna()
-    #     )
-    #     if table_name == "boundary":
-    #         d = boundary_column_descriptions
-    #     else:
-    #         d = (
-    #             column_description.set_index(column_description.iloc[:, 0])[
-    #                 "Descriptive name"
-    #             ]
-    #             .str.replace("\r", " ")
-    #             .dropna()
-    #             .rename(lambda x: x.replace("\r", ""))
-    #             .to_dict()
-    #         )
+    for table_name, subsection in table_subsections:
+        # if Path(f"{table_name}.json").exists():
+        #     continue
+        column_description = (
+            pd.concat(
+                [
+                    x
+                    for x in column_descriptions
+                    if x["Subsection"].str.startswith(subsection + ".").all()
+                ]
+            )
+            .iloc[:, [1, 2]]
+            .dropna()
+        )
+        if table_name == "boundary":
+            d = boundary_column_descriptions
+        else:
+            d = (
+                column_description.set_index(column_description.iloc[:, 0])[
+                    "Descriptive name"
+                ]
+                .str.replace("\r", " ")
+                .dropna()
+                .rename(lambda x: x.replace("\r", ""))
+                .to_dict()
+            )
 
-    #     uri = f"abfs://cpdata/raw/fia/{table_name}.parquet"
-    #     df = dd.read_parquet(uri, storage_options=storage_options)
+        uri = f"abfs://cpdata/raw/fia/{table_name}.parquet"
+        df = dd.read_parquet(uri, storage_options=storage_options)
 
-    #     result = list(d)
-    #     expected = df.columns.tolist()
+        result = list(d)
+        expected = df.columns.tolist()
 
-    #     if result != expected:
-    #         print(f"Column mismatch for {table_name}!", set(result) ^ set(expected))
+        if result != expected:
+            print(f"Column mismatch for {table_name}!", set(result) ^ set(expected))
 
-    #     item = pystac.Item(
-    #         f"{table_name}",
-    #         geometry=None,
-    #         bbox=(-179.14734, -14.53, 179.77847, 71.352561),
-    #         datetime=datetime.datetime(2020, 6, 1),  # date accessed from FIA...
-    #         properties={},
-    #     )
-    #     result = stac_table.generate(
-    #         uri,
-    #         item,
-    #         storage_options=storage_options,
-    #         asset_extra_fields={"table:storage_options": storage_options},
-    #         proj=False,
-    #         count_rows=False,
-    #     )
-    #     result.properties["table:columns"] = [
-    #         x
-    #         for x in result.properties["table:columns"]
-    #         if x["name"] != "__null_dask_index__"
-    #     ]
+        bbox = [-179.14734, -14.53, 179.77847, 71.352561]
+        geometry = shapely.geometry.mapping(shapely.geometry.box(*bbox))
+        item = pystac.Item(
+            f"{table_name}",
+            geometry=geometry,
+            bbox=bbox,
+            datetime=datetime.datetime(2020, 6, 1),  # date accessed from FIA...
+            properties={},
+        )
+        result = stac_table.generate(
+            uri,
+            item,
+            storage_options=storage_options,
+            asset_extra_fields={"table:storage_options": storage_options},
+            proj=False,
+            count_rows=False,
+        )
+        result.properties["table:columns"] = [
+            x
+            for x in result.properties["table:columns"]
+            if x["name"] != "__null_dask_index__"
+        ]
 
-    #     for column in result.properties["table:columns"]:
-    #         description = d.get(column["name"])
-    #         if description:
-    #             column["description"] = d[column["name"]]
-    #         else:
-    #             print(f"Missing description for {table_name}.{column['name']}")
+        for column in result.properties["table:columns"]:
+            description = d.get(column["name"])
+            if description:
+                column["description"] = d[column["name"]]
+            else:
+                print(f"Missing description for {table_name}.{column['name']}")
 
-    #     with open(items.joinpath(f"{table_name}.json"), "w") as f:
-    #         json.dump(result.to_dict(), f, indent=2)
-    #     print(f"wrote {table_name}.json")
+        with open(items.joinpath(f"{table_name}.json"), "w") as f:
+            json.dump(result.to_dict(), f, indent=2)
+        print(f"wrote {table_name}.json")
 
     # Handle the collection now.
     table_columns = ["Section", "Oracle table name", "Table name", "Description"]
