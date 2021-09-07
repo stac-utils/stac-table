@@ -313,7 +313,7 @@ def main():
             "type": stac_table.PARQUET_MEDIA_TYPE,
             "title": "Dataset root",
             "roles": ["data"],
-            **storage_options,
+            "table:storage_options": storage_options,
         }
     }
 

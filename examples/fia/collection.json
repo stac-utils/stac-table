@@ -22,7 +22,9 @@
       "roles": [
         "data"
       ],
-      "account_name": "cpdataeuwest"
+      "table:storage_options": {
+        "account_name": "cpdataeuwest"
+      }
     }
   },
   "table:tables": [
