@@ -1,5 +1,6 @@
 """
-Generates a STAC Collection and item for GBIF, using the parquet files on Azure: http://aka.ms/ai4edata-gbif.
+Generates a STAC Collection and item for GBIF, using the parquet files on
+Azure: http://aka.ms/ai4edata-gbif.
 
 Requires `adlfs` and `lxml` in addition to the other packages.
 
@@ -100,9 +101,10 @@ def main():
 
     collection.stac_extensions.append(stac_table.SCHEMA_URI)
     collection.keywords = ["GBIF", "Biodiversity", "Species"]
-    collection.extra_fields[
-        "msft:short_description"
-    ] = "An international network and data infrastructure funded by the world's governments providing global data that document the occurrence of species."
+    collection.extra_fields["msft:short_description"] = (
+        "An international network and data infrastructure funded by the world's "
+        "governments providing global data that document the occurrence of species."
+    )
     collection.extra_fields["msft:container"] = "gbif"
     collection.extra_fields["msft:storage_account"] = "ai4edataeuwest"
     collection.providers = [
@@ -123,7 +125,10 @@ def main():
     ]
     collection.assets["thumbnail"] = pystac.Asset(
         title="Forest Inventory and Analysis",
-        href="https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/gbif.png",
+        href=(
+            "https://ai4edatasetspublicassets.blob.core.windows.net/"
+            "assets/pc_thumbnails/gbif.png"
+        ),
         media_type="image/png",
     )
     collection.links = [

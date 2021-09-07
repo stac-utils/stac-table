@@ -13,7 +13,7 @@ dependencies = [
     "fsspec",
     "pandas",
     "pyarrow",
-    "pystac>=1.1.0",
+    "pystac[validation]>=1.1.0",
     "shapely",
 ]
 

@@ -114,7 +114,10 @@ boundary_column_descriptions = {
     "MODIFIED_DATE": "Modified date",
     "MODIFIED_IN_INSTANCE": "Modified in instance",
 }
-boundary_table_description = "Boundary table. This table provides a description of the demarcation line between two conditions that occur on a single subplot"
+boundary_table_description = (
+    "Boundary table. This table provides a description of the demarcation line "
+    "between two conditions that occur on a single subplot"
+)
 
 additional_table_descriptions = {
     "subp_cond_chng_mtrx": """\

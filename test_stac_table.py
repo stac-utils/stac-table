@@ -163,7 +163,8 @@ class TestItem:
         # Bug in pandas? We apparently aren't writing the metadata...
         # df["A"].attrs = {"key": "value!"}
         # df.to_parquet("data.parquet")
-        # item = pystac.Item("naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {})
+        # item = pystac.Item("naturalearth_lowres", None, None,
+        #                    datetime.datetime(2021, 1, 1), {})
         # result = stac_table.generate(
         #     "data.parquet", item, datetime_column="A", infer_datetime="range"
         # )

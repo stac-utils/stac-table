@@ -4,8 +4,7 @@ Generate STAC Collections for tabular datasets.
 __version__ = "1.0.0"
 import copy
 import enum
-from pathlib import Path
-from typing import TypeVar, Union
+from typing import TypeVar
 
 import dask
 import pystac
@@ -19,7 +18,8 @@ import shapely.geometry
 
 T = TypeVar("T", pystac.Collection, pystac.Item)
 SCHEMA_URI = "https://stac-extensions.github.io/table/v1.2.0/schema.json"
-# https://issues.apache.org/jira/browse/PARQUET-1889: parquet doesn't officially have a type yet.
+# https://issues.apache.org/jira/browse/PARQUET-1889: parquet doesn't officially
+# have a type yet.
 PARQUET_MEDIA_TYPE = "application/x-parquet"
 
 
@@ -50,7 +50,8 @@ def generate(
     Parameters
     ----------
     uri : str
-        The fsspec-compatible URI pointing to the input table to generate a STAC item for.
+        The fsspec-compatible URI pointing to the input table to generate a
+        STAC item for.
     template : pystac.Item
         The template item. This will be cloned and new data will be filled in.
     infer_bbox : str, optional
@@ -58,15 +59,17 @@ def generate(
 
         .. note::
 
-           If the dataset doesn't provide spatial partitions, this will require computation.
+           If the dataset doesn't provide spatial partitions, this will
+           require computation.
 
     infer_geometry: bool, optional
-        Whether to fill the item's `geometry` field with the union of the geometries in the
-        `infer_bbox` column.
+        Whether to fill the item's `geometry` field with the union of the
+        geometries in the `infer_bbox` column.
 
     datetime_column: str, optional
-        The column name to use when setting the Item's `datetime` or `start_datetime`
-        and `end_datetime` properties. The method used is determined by `infer_datetime`.
+        The column name to use when setting the Item's `datetime` or
+        `start_datetime` and `end_datetime` properties. The method used is
+        determined by `infer_datetime`.
 
     infer_datetime: str, optional.
         The method used to find a datetime from the values in `datetime_column`.
@@ -74,8 +77,10 @@ def generate(
 
         - no : do not infer a datetime
         - midpoint : Set `datetime` to the midpoint of the highest and lowest values.
-        - unique : Set `datetime` to the unique value. Raises if more than one unique value is found.
-        - range : Set `start_datetime` and `end_datetime` to the minimum and maximum values.
+        - unique : Set `datetime` to the unique value. Raises if more than one
+          unique value is found.
+        - range : Set `start_datetime` and `end_datetime` to the minimum and
+          maximum values.
 
     count_rows : bool, default True
         Whether to add the row count to `table:row_count`.
@@ -114,8 +119,8 @@ def generate(
     Examples
     --------
 
-    This example generates a STAC item based on the "naturalearth_lowres" datset from geopandas.
-    There's a bit of setup.
+    This example generates a STAC item based on the "naturalearth_lowres" datset
+    from geopandas. There's a bit of setup.
 
     >>> import datetime, geopandas, pystac, stac_table
     >>> gdf = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
