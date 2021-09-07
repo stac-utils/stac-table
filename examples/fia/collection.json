@@ -12,8 +12,19 @@
     }
   ],
   "stac_extensions": [
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
     "https://stac-extensions.github.io/table/v1.2.0/schema.json"
   ],
+  "item_assets": {
+    "data": {
+      "type": "application/x-parquet",
+      "title": "Dataset root",
+      "roles": [
+        "data"
+      ],
+      "account_name": "cpdataeuwest"
+    }
+  },
   "table:tables": [
     {
       "name": "Survey Table",

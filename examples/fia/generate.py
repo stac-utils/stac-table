@@ -307,6 +307,16 @@ def main():
         license="CC0-1.0",
     )
     collection.title = "Forest Inventory and Analysis"
+    pystac.extensions.item_assets.ItemAssetsExtension.add_to(collection)
+    collection.extra_fields["item_assets"] = {
+        "data": {
+            "type": stac_table.PARQUET_MEDIA_TYPE,
+            "title": "Dataset root",
+            "roles": ["data"],
+            **storage_options,
+        }
+    }
+
     collection.stac_extensions.append(stac_table.SCHEMA_URI)
     collection.keywords = [
         "Forest",
@@ -363,6 +373,8 @@ def main():
             title="License",
         )
     ]
+
+    collection.validate()
 
     with open("collection.json", "w") as f:
         json.dump(collection.to_dict(), f, indent=2)
