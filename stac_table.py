@@ -174,14 +174,22 @@ def generate(
         bbox = data.spatial_partitions.unary_union.bounds
         # TODO: may need to convert to epsg:4326
         extra_proj["proj:bbox"] = bbox
-
-        template.bbox = data.spatial_partitions.unary_union.bounds
+        template.bbox = bbox
 
     if infer_geometry:
         geometry = shapely.geometry.mapping(data.unary_union.compute())
         # TODO: may need to convert to epsg:4326
         extra_proj["proj:geometry"] = geometry
         template.geometry = geometry
+
+    if infer_bbox and template.geometry is None:
+        # If bbox is set then geometry must be set as well.
+        template.geometry = shapely.geometry.mapping(
+            shapely.geometry.box(*template.bbox)
+        )
+
+    if infer_geometry and template.bbox is None:
+        template.bbox = shapely.geometry.shape(template.geometry).bounds
 
     if proj or extra_proj:
         template.properties.update(**extra_proj, **proj)
@@ -203,8 +211,8 @@ def generate(
     if infer_datetime == InferDatetimeOptions.range:
         values = dask.compute(data[datetime_column].min(), data[datetime_column].max())
         values = list(pd.Series(values).dt.to_pydatetime())
-        template.properties["start_datetime"] = values[0]
-        template.properties["end_datetime"] = values[1]
+        template.properties["start_datetime"] = values[0].isoformat() + "Z"
+        template.properties["end_datetime"] = values[1].isoformat() + "Z"
 
     if count_rows:
         template.properties["table:row_count"] = sum(

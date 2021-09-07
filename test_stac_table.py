@@ -1,13 +1,11 @@
 import datetime
 import os
 import shutil
-import warnings
 from pathlib import Path
 
 import pandas as pd
 import dask_geopandas
 import geopandas
-import pyarrow.parquet
 import pystac
 import pytest
 import shapely.geometry
@@ -42,7 +40,9 @@ class TestItem:
 
         gdf.to_parquet("data.parquet")
 
-        item = pystac.Item("naturalearth_lowres", geometry, bbox, "2021-01-01", {})
+        item = pystac.Item(
+            "naturalearth_lowres", geometry, bbox, datetime.datetime(2021, 1, 1), {}
+        )
         ds = str(Path("data.parquet").absolute())
         result = stac_table.generate(
             ds,
@@ -76,7 +76,9 @@ class TestItem:
             crs=4326,
         )
         df.to_parquet("data.parquet")
-        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        item = pystac.Item(
+            "naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {}
+        )
         result = stac_table.generate("data.parquet", item, infer_bbox=True)
 
         assert result.bbox == (1.0, 2.0, 2.0, 3.0)
@@ -90,7 +92,9 @@ class TestItem:
             crs=4326,  # TODO: other epsg
         )
         df.to_parquet("data.parquet")
-        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        item = pystac.Item(
+            "naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {}
+        )
         result = stac_table.generate("data.parquet", item, infer_geometry=True)
         expected = {"type": "MultiPoint", "coordinates": ((1.0, 2.0), (2.0, 3.0))}
 
@@ -104,12 +108,13 @@ class TestItem:
             geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
         )
         df.to_parquet("data.parquet")
-        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        item = pystac.Item(
+            "naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {}
+        )
         result = stac_table.generate(
             "data.parquet", item, datetime_column="A", infer_datetime="midpoint"
         )
-
-        assert result.properties["datetime"] == datetime.datetime(2000, 1, 2)
+        assert result.properties["datetime"] == "2021-01-01T00:00:00Z"
 
     def test_infer_datetime_unique(self):
         df = geopandas.GeoDataFrame(
@@ -117,12 +122,13 @@ class TestItem:
             geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
         )
         df.to_parquet("data.parquet")
-        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        item = pystac.Item(
+            "naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {}
+        )
         result = stac_table.generate(
             "data.parquet", item, datetime_column="A", infer_datetime="unique"
         )
-
-        assert result.properties["datetime"] == datetime.datetime(2000, 1, 1)
+        assert result.properties["datetime"] == "2021-01-01T00:00:00Z"
 
     def test_infer_datetime_range(self):
         df = geopandas.GeoDataFrame(
@@ -130,13 +136,15 @@ class TestItem:
             geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
         )
         df.to_parquet("data.parquet")
-        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        item = pystac.Item(
+            "naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {}
+        )
         result = stac_table.generate(
             "data.parquet", item, datetime_column="A", infer_datetime="range"
         )
 
-        assert result.properties["start_datetime"] == datetime.datetime(2000, 1, 1)
-        assert result.properties["end_datetime"] == datetime.datetime(2000, 1, 3)
+        assert result.properties["start_datetime"] == "2000-01-01T00:00:00Z"
+        assert result.properties["end_datetime"] == "2000-01-03T00:00:00Z"
 
     def test_metadata(self):
         df = geopandas.GeoDataFrame(
@@ -144,7 +152,9 @@ class TestItem:
             geometry=[shapely.geometry.Point(1, 2), shapely.geometry.Point(2, 3)],
         )
         df.to_parquet("data.parquet")
-        item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        item = pystac.Item(
+            "naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {}
+        )
         result = stac_table.generate(
             "data.parquet", item, datetime_column="A", infer_datetime="range"
         )
@@ -153,7 +163,7 @@ class TestItem:
         # Bug in pandas? We apparently aren't writing the metadata...
         # df["A"].attrs = {"key": "value!"}
         # df.to_parquet("data.parquet")
-        # item = pystac.Item("naturalearth_lowres", None, None, "2021-01-01", {})
+        # item = pystac.Item("naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {})
         # result = stac_table.generate(
         #     "data.parquet", item, datetime_column="A", infer_datetime="range"
         # )
