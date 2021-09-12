@@ -171,6 +171,7 @@ def main():
     token = planetary_computer.sas.get_token("ai4edataeuwest", "us-census")
     fs = adlfs.AzureBlobFileSystem("ai4edataeuwest", credential=token.token)
     datasets = fs.ls("us-census/2020")
+    datasets = [x for x in datasets if x.endswith(".parquet")]
     storage_options = {"account_name": "ai4edataeuwest", "credential": token.token}
     asset_extra_fields = {"table:storage_options": {"account_name": "ai4edataeuwest"}}
 
@@ -293,8 +294,8 @@ def main():
         ),
     ]
     collection.assets["thumbnail"] = pystac.Asset(
-        title="Forest Inventory and Analysis",
-        href="https://camo.githubusercontent.com/40dc57a0d4f7a365af940e1ce43b419dc12b173eea645907c28e2a2a50267324/68747470733a2f2f6c6162732e676269662e6f72672f7e6d626c6973736574742f323031392f31302f616e616c79746963732d6d6170732f776f726c642d323032312d30312d30312e706e67",
+        title="US Census",
+        href="https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/us-census.png",
         media_type="image/png",
     )
     collection.links = [
