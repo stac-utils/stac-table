@@ -166,6 +166,19 @@ table_descriptions = {
     ),
 }
 
+bboxes = [
+    [-124.763068, 24.523096, -66.949895, 49.384358],
+    [-179.148909, 51.214183, -129.974167, 71.365162],
+    [172.461667, 51.357688, 179.77847, 53.01075],
+    [-178.334698, 18.910361, -154.806773, 28.402123],
+    [144.618068, 13.234189, 144.956712, 13.654383],
+    [-67.945404, 17.88328, -65.220703, 18.515683],
+    [144.886331, 14.110472, 146.064818, 20.553802],
+    [-65.085452, 17.673976, -64.564907, 18.412655],
+    [-171.089874, -14.548699, -168.1433, -11.046934],
+    [-178.334698, 18.910361, -154.806773, 28.402123],
+]
+
 
 def main():
     token = planetary_computer.sas.get_token("ai4edataeuwest", "us-census")
@@ -224,25 +237,63 @@ def main():
 
         rich.print(f"[green]Processed[/green] {dataset}")
 
+    # Census Blocks -------------------------------------------------------------------
+    # A few things prevent us from just using prefix like we'd want,
+    # so we grab just a single row group and hope that it's a good enough approximation.
+    prefix = "us-census/2020/tl_2020_FULL_tabblock20.parquet"
+    row_group = fs.ls(fs.ls(prefix)[1])[0]
+    geom = shapely.ops.cascaded_union([shapely.geometry.box(*x) for x in bboxes])
+
+    item = pystac.Item(
+        "2020-tl_2020_FULL_tabblock20",
+        geometry=shapely.geometry.mapping(geom),
+        bbox=geom.bounds,
+        datetime=datetime.datetime(2021, 8, 1),
+        properties={},
+    )
+    result = stac_table.generate(
+        f"abfs://{row_group}",
+        item,
+        storage_options=storage_options,
+        asset_extra_fields={"storage_options": {"account_name": "ai4edataeuwest"}},
+        infer_bbox=False,
+        count_rows=False,
+        proj=False,
+    )
+
+    column_descriptions = dict(
+        TRACTCE20="Census Tract code",
+        BLOCKCE20="Census Block code",
+        GEOID20="Concatenation of county FIPS code, census tract code, and census block number",
+        NAME20="Name and census block number",
+        ALAND20="Current land area",
+        AWATER20="Current water area",
+        INTPTLAT20="Current latitude of the internal point",
+        INTPTLON20="Current longitude of the internal point",
+        geometry="Coordinates for block polygons",
+        STUSAB="FIPS State Postal Code",
+        P0010001="Total Block Population",
+        COUNTYFP20="County FIPS code (only included if loading up entire state's census block file)",
+    )
+
+    for column in result.properties["table:columns"]:
+        if column["name"] in column_descriptions:
+            column["description"] = column_descriptions[column["name"]]
+        else:
+            print(f"missing description for {column['name']}")
+
+    with open("items/tl_2020_FULL_tabblock20.json", "w") as f:
+        json.dump(result.to_dict(), f)
+    rich.print("[green]Processed[/green] tl_2020_FULL_tabblock20")
+
+    # Collection ----------------------------------------------------------------------
+
     collection = pystac.Collection(
         "us-census",
         description="{{ collection.description }}",
         extent=pystac.Extent(
             # spatial extent from the US Boundary file's bounds.
-            spatial=pystac.collection.SpatialExtent(
-                [
-                    [-124.763068, 24.523096, -66.949895, 49.384358],
-                    [-179.148909, 51.214183, -129.974167, 71.365162],
-                    [172.461667, 51.357688, 179.77847, 53.01075],
-                    [-178.334698, 18.910361, -154.806773, 28.402123],
-                    [144.618068, 13.234189, 144.956712, 13.654383],
-                    [-67.945404, 17.88328, -65.220703, 18.515683],
-                    [144.886331, 14.110472, 146.064818, 20.553802],
-                    [-65.085452, 17.673976, -64.564907, 18.412655],
-                    [-171.089874, -14.548699, -168.1433, -11.046934],
-                    [-178.334698, 18.910361, -154.806773, 28.402123],
-                ]
-            ),
+            spatial=pystac.collection.SpatialExtent(bboxes),
             temporal=pystac.collection.TemporalExtent(
                 [datetime.datetime(2021, 8, 1), datetime.datetime(2021, 8, 1)]
             ),
