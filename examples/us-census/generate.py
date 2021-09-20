@@ -5,6 +5,7 @@ import itertools
 from pathlib import Path
 
 import adlfs
+import pandas as pd
 import pystac
 import stac_table
 import shapely.geometry
@@ -240,19 +241,56 @@ def main():
     # Census Blocks -------------------------------------------------------------------
     # A few things prevent us from just using prefix like we'd want,
     # so we grab just a single row group and hope that it's a good enough approximation.
-    prefix = "us-census/2020/tl_2020_FULL_tabblock20.parquet"
-    row_group = fs.ls(fs.ls(prefix)[1])[0]
-    geom = shapely.ops.cascaded_union([shapely.geometry.box(*x) for x in bboxes])
-
+    prefix = "us-census/2020/census_blocks_geo.parquet"
+    geom = shapely.ops.cascaded_union([shapely.geometry.box(*bbox) for bbox in bboxes])
     item = pystac.Item(
-        "2020-tl_2020_FULL_tabblock20",
+        "2020-census-blocks-geo.parquet",
         geometry=shapely.geometry.mapping(geom),
         bbox=geom.bounds,
         datetime=datetime.datetime(2021, 8, 1),
         properties={},
     )
     result = stac_table.generate(
-        f"abfs://{row_group}",
+        f"abfs://{prefix}",
+        item,
+        storage_options=storage_options,
+        asset_extra_fields={"storage_options": {"account_name": "ai4edataeuwest"}},
+        infer_bbox=False,
+        count_rows=False,
+        proj=False,
+    )
+    column_descriptions = {
+        "STATEFP": "State FIPS code",
+        "COUNTYFP": "County FIPS code",
+        "TRACTCE": "Census tract",
+        "BLOCKCE": "Census block",
+        "ALAND": "Area (Land)",
+        "AWATER": "Area (Water)",
+        "INTPTLAT": "Internal Point (Latitude)",
+        "INTPTLON": "Internal Point (Longitude)",
+        "geometry": "Census block geometry",
+        "GEOID": "Geographic record identifier",
+    }
+    for v in result.properties["table:columns"]:
+        v["description"] = column_descriptions[v["name"]]
+
+    result.validate()
+
+    with open("items/census_block_geo.parquet", "w") as f:
+        json.dump(result.to_dict(), f)
+
+    # population
+    prefix = "us-census/2020/census_blocks_population.parquet"
+    geom = shapely.ops.cascaded_union([shapely.geometry.box(*bbox) for bbox in bboxes])
+    item = pystac.Item(
+        "2020-census-blocks-population.parquet",
+        geometry=shapely.geometry.mapping(geom),
+        bbox=geom.bounds,
+        datetime=datetime.datetime(2021, 8, 1),
+        properties={},
+    )
+    result = stac_table.generate(
+        f"abfs://{prefix}",
         item,
         storage_options=storage_options,
         asset_extra_fields={"storage_options": {"account_name": "ai4edataeuwest"}},
@@ -261,30 +299,24 @@ def main():
         proj=False,
     )
 
-    column_descriptions = dict(
-        TRACTCE20="Census Tract code",
-        BLOCKCE20="Census Block code",
-        GEOID20="Concatenation of county FIPS code, census tract code, and census block number",
-        NAME20="Name and census block number",
-        ALAND20="Current land area",
-        AWATER20="Current water area",
-        INTPTLAT20="Current latitude of the internal point",
-        INTPTLON20="Current longitude of the internal point",
-        geometry="Coordinates for block polygons",
-        STUSAB="FIPS State Postal Code",
-        P0010001="Total Block Population",
-        COUNTYFP20="County FIPS code (only included if loading up entire state's census block file)",
+    url = (
+        "https://www2.census.gov/programs-surveys/decennial/rdo/about/2020-census-program/"
+        "Phase3/SupportMaterials/2020_PLSummaryFile_FieldNames.xlsx"
     )
+    column_descriptions = (
+        pd.read_excel(url, sheet_name="2020 P.L. Segment 1 Definitions")
+        .set_index("DATA DICTIONARY REFERENCE NAME")["TABLE NUMBER AND CONTENTS"]
+        .to_dict()
+    )
+    column_descriptions["GEOID"] = "Geographic record identifier"
 
-    for column in result.properties["table:columns"]:
-        if column["name"] in column_descriptions:
-            column["description"] = column_descriptions[column["name"]]
-        else:
-            print(f"missing description for {column['name']}")
+    for v in result.properties["table:columns"]:
+        v["description"] = column_descriptions[v["name"]]
 
-    with open("items/tl_2020_FULL_tabblock20.json", "w") as f:
+    result.validate()
+
+    with open("items/census_block_population.parquet", "w") as f:
         json.dump(result.to_dict(), f)
-    rich.print("[green]Processed[/green] tl_2020_FULL_tabblock20")
 
     # Collection ----------------------------------------------------------------------
 
