@@ -244,7 +244,7 @@ def main():
     prefix = "us-census/2020/census_blocks_geo.parquet"
     geom = shapely.ops.cascaded_union([shapely.geometry.box(*bbox) for bbox in bboxes])
     item = pystac.Item(
-        "2020-census-blocks-geo.parquet",
+        "2020-census-blocks-geo",
         geometry=shapely.geometry.mapping(geom),
         bbox=geom.bounds,
         datetime=datetime.datetime(2021, 8, 1),
@@ -276,14 +276,14 @@ def main():
 
     result.validate()
 
-    with open("items/census_block_geo.parquet", "w") as f:
+    with open("items/census_block_geo.json", "w") as f:
         json.dump(result.to_dict(), f)
 
     # population
     prefix = "us-census/2020/census_blocks_population.parquet"
     geom = shapely.ops.cascaded_union([shapely.geometry.box(*bbox) for bbox in bboxes])
     item = pystac.Item(
-        "2020-census-blocks-population.parquet",
+        "2020-census-blocks-population",
         geometry=shapely.geometry.mapping(geom),
         bbox=geom.bounds,
         datetime=datetime.datetime(2021, 8, 1),
@@ -315,7 +315,7 @@ def main():
 
     result.validate()
 
-    with open("items/census_block_population.parquet", "w") as f:
+    with open("items/census_block_population.json", "w") as f:
         json.dump(result.to_dict(), f)
 
     # Collection ----------------------------------------------------------------------
