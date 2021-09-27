@@ -348,7 +348,12 @@ def main():
         }
     }
 
-    collection.keywords = ["US Census Bureau", "Administrative boundaries"]
+    collection.keywords = [
+        "US Census Bureau",
+        "Administrative boundaries",
+        "Population",
+        "Demographics",
+    ]
     collection.extra_fields["table:tables"] = table_tables
     collection.extra_fields[
         "msft:short_description"
