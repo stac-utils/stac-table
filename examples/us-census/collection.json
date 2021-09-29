@@ -260,7 +260,9 @@
   "license": "proprietary",
   "keywords": [
     "US Census Bureau",
-    "Administrative boundaries"
+    "Administrative boundaries",
+    "Population",
+    "Demographics"
   ],
   "providers": [
     {

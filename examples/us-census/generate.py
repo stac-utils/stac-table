@@ -254,7 +254,9 @@ def main():
         f"abfs://{prefix}",
         item,
         storage_options=storage_options,
-        asset_extra_fields={"storage_options": {"account_name": "ai4edataeuwest"}},
+        asset_extra_fields={
+            "table:storage_options": {"account_name": "ai4edataeuwest"}
+        },
         infer_bbox=False,
         count_rows=False,
         proj=False,
@@ -293,7 +295,9 @@ def main():
         f"abfs://{prefix}",
         item,
         storage_options=storage_options,
-        asset_extra_fields={"storage_options": {"account_name": "ai4edataeuwest"}},
+        asset_extra_fields={
+            "table:storage_options": {"account_name": "ai4edataeuwest"}
+        },
         infer_bbox=False,
         count_rows=False,
         proj=False,
