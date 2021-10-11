@@ -76,7 +76,7 @@ def main():
 
     dates = [
         datetime.datetime(*list(map(int, dates[0].split("/")[-1].split("-")))),
-        datetime.datetime(*list(map(int, dates[-1].split("/")[-1].split("-")))),
+        None,
     ]
     collection = pystac.Collection(
         "gbif",
