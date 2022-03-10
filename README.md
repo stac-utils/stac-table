@@ -2,6 +2,14 @@
 
 This library generates STAC objects for tabular dataset. It uses the [`table`][table] STAC extension.
 
+## Installation
+
+`stac-table` is only available through GitHub right now:
+
+```
+python -m pip install git+https://github.com/TomAugspurger/stac-table
+```
+
 ## Examples
 
 Generate a STAC item from a Parquet Dataset.
