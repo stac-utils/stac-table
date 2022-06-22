@@ -8,10 +8,10 @@ authors = [{name = "Tom Augspurger", email = "taugspurger@microsoft.com"}]
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
-    # "git+https://geopandas/dask-geopandas",
     "dask",
     "fsspec",
     "pandas",
+    "dask-geopandas",
     "pyarrow",
     "pystac[validation]>=1.1.0",
     "shapely",
