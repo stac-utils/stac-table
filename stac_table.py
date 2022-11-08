@@ -275,7 +275,7 @@ def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
 
 def parquet_dataset_from_url(
     url: str, storage_options
-) -> pyarrow.parquet._ParquetDatasetV2:
+):
     fs, _, _ = fsspec.get_fs_token_paths(url, storage_options=storage_options)
     pa_fs = pyarrow.fs.PyFileSystem(pyarrow.fs.FSSpecHandler(fs))
     url2 = url.split("://", 1)[-1]  # pyarrow doesn't auto-strip the prefix.
