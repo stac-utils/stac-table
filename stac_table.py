@@ -7,14 +7,14 @@ import enum
 from typing import TypeVar
 
 import dask
-import pystac
-import pandas as pd
-import pyarrow
-import pyarrow.parquet
-import fsspec
 import dask_geopandas
+import fsspec
+import pandas as pd
+import pyarrow as pa
+import pyproj
+import pystac
 import shapely.geometry
-
+from shapely.ops import transform
 
 T = TypeVar("T", pystac.Collection, pystac.Item)
 SCHEMA_URI = "https://stac-extensions.github.io/table/v1.2.0/schema.json"
@@ -156,6 +156,7 @@ def generate(
         or proj is True
     ):
         data = dask_geopandas.read_parquet(uri, storage_options=storage_options)
+        data.calculate_spatial_partitions()
     #     # TODO: this doesn't actually work
     #     data = dask_geopandas.read_parquet(
     #         ds.files, storage_options={"filesystem": ds.filesystem}
@@ -176,16 +177,27 @@ def generate(
 
     extra_proj = {}
     if infer_bbox:
+        src_crs = data.spatial_partitions.crs.to_epsg()
+        tf = pyproj.Transformer.from_crs(src_crs, 4326, always_xy=True)
+
         bbox = data.spatial_partitions.unary_union.bounds
-        # TODO: may need to convert to epsg:4326
+        # NOTE: bbox of unary union will be stored under proj extension as projected
         extra_proj["proj:bbox"] = bbox
-        template.bbox = bbox
+
+        # NOTE: bbox will be stored in pystsac.Item.bbox in EPSG:4326
+        bbox = transform(tf.transform, shapely.geometry.box(*bbox))
+        template.bbox = bbox.bounds
 
     if infer_geometry:
-        geometry = shapely.geometry.mapping(data.unary_union.compute())
-        # TODO: may need to convert to epsg:4326
-        extra_proj["proj:geometry"] = geometry
-        template.geometry = geometry
+        # NOTE: geom  under proj extension as projected
+        geometry = data.unary_union.compute()
+        extra_proj["proj:geometry"] = shapely.geometry.mapping(geometry)
+
+        # NOTE: geometry will be stored in pystsac.Item.geometry in EPSG:4326
+        src_crs = data.spatial_partitions.crs.to_epsg()
+        tf = pyproj.Transformer.from_crs(src_crs, 4326, always_xy=True)
+        geometry = transform(tf.transform, geometry)
+        template.geometry = shapely.geometry.mapping(geometry)
 
     if infer_bbox and template.geometry is None:
         # If bbox is set then geometry must be set as well.
@@ -200,7 +212,8 @@ def generate(
         template.properties.update(**extra_proj, **proj)
 
     if infer_datetime != InferDatetimeOptions.no and datetime_column is None:
-        raise ValueError("Must specify 'datetime_column' when 'infer_datetime != no'.")
+        msg = "Must specify 'datetime_column' when 'infer_datetime != no'."
+        raise ValueError(msg)
 
     if infer_datetime == InferDatetimeOptions.midpoint:
         values = dask.compute(data[datetime_column].min(), data[datetime_column].max())
@@ -210,7 +223,8 @@ def generate(
         values = data[datetime_column].unique().compute()
         n = len(values)
         if n > 1:
-            raise ValueError(f"infer_datetime='unique', but {n} unique values found.")
+            msg = f"infer_datetime='unique', but {n} unique values found."
+            raise ValueError(msg)
         template.properties["datetime"] = values[0].to_pydatetime()
 
     if infer_datetime == InferDatetimeOptions.range:
@@ -258,7 +272,7 @@ def get_proj(ds):
     return proj
 
 
-def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
+def get_columns(ds: pa.parquet.ParquetDataset) -> list:
     columns = []
     fragment = ds.fragments[0]
 
@@ -273,13 +287,9 @@ def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
     return columns
 
 
-def parquet_dataset_from_url(
-    url: str, storage_options
-):
+def parquet_dataset_from_url(url: str, storage_options):
     fs, _, _ = fsspec.get_fs_token_paths(url, storage_options=storage_options)
-    pa_fs = pyarrow.fs.PyFileSystem(pyarrow.fs.FSSpecHandler(fs))
+    pa_fs = pa.fs.PyFileSystem(pa.fs.FSSpecHandler(fs))
     url2 = url.split("://", 1)[-1]  # pyarrow doesn't auto-strip the prefix.
-    ds = pyarrow.parquet.ParquetDataset(
-        url2, filesystem=pa_fs, use_legacy_dataset=False
-    )
+    ds = pa.parquet.ParquetDataset(url2, filesystem=pa_fs, use_legacy_dataset=False)
     return ds
