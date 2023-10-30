@@ -155,12 +155,13 @@ def generate(
         or infer_datetime != InferDatetimeOptions.no
         or proj is True
     ):
+        #     # TODO: this doesn't actually work
+        #     data = dask_geopandas.read_parquet(
+        #         ds.files, storage_options={"filesystem": ds.filesystem}
+        #     )
         data = dask_geopandas.read_parquet(uri, storage_options=storage_options)
-        data.calculate_spatial_partitions()
-    #     # TODO: this doesn't actually work
-    #     data = dask_geopandas.read_parquet(
-    #         ds.files, storage_options={"filesystem": ds.filesystem}
-    #     )
+        if not data.spatial_partitions:
+            data.calculate_spatial_partitions()
 
     columns = get_columns(ds)
     template.properties["table:columns"] = columns
