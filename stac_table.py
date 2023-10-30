@@ -160,7 +160,7 @@ def generate(
         #         ds.files, storage_options={"filesystem": ds.filesystem}
         #     )
         data = dask_geopandas.read_parquet(uri, storage_options=storage_options)
-        if not data.spatial_partitions:
+        if data.spatial_partitions is None:
             data.calculate_spatial_partitions()
 
     columns = get_columns(ds)
