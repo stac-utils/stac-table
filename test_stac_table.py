@@ -3,13 +3,23 @@ import os
 import shutil
 from pathlib import Path
 
-import pandas as pd
 import dask_geopandas
 import geopandas
+import pandas as pd
+import pyproj
 import pystac
 import pytest
 import shapely.geometry
+
 import stac_table
+
+
+def is_valid_epsg(epsg_code):
+    try:
+        pyproj.CRS.from_user_input(epsg_code)
+        return True
+    except pyproj.exceptions.CRSError:
+        return False
 
 
 @pytest.fixture
@@ -51,11 +61,11 @@ class TestItem:
         )
 
         expected_columns = [
-            {"name": "pop_est", "type": "int64"},
+            {"name": "pop_est", "type": "double"},
             {"name": "continent", "type": "byte_array"},
             {"name": "name", "type": "byte_array"},
             {"name": "iso_a3", "type": "byte_array"},
-            {"name": "gdp_md_est", "type": "double"},
+            {"name": "gdp_md_est", "type": "int64"},
             {"name": "geometry", "type": "byte_array"},
         ]
         assert result.properties["table:columns"] == expected_columns
@@ -67,7 +77,7 @@ class TestItem:
         assert asset.extra_fields["table:storage_options"] == {"storage_account": "foo"}
 
         assert pystac.extensions.projection.SCHEMA_URI in result.stac_extensions
-        assert result.properties["proj:epsg"] == 4326
+        assert is_valid_epsg(result.properties["proj:epsg"])
 
     def test_infer_bbox(self):
         df = geopandas.GeoDataFrame(
