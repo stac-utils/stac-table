@@ -265,8 +265,12 @@ def get_columns(ds: pyarrow.parquet.ParquetDataset) -> list:
     for field, col in zip(ds.schema, fragment.metadata.schema):
         if field.name == "__null_dask_index__":
             continue
-
-        column = {"name": field.name, "type": col.physical_type.lower()}
+        
+        if col.logical_type.type == "NONE":
+            col_type = col.physical_type
+        else:
+            col_type = col.logical_type.type
+        column = {"name": field.name, "type": col_type.lower()}
         if field.metadata is not None:
             column["metadata"] = field.metadata
         columns.append(column)
