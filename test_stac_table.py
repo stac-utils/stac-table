@@ -52,9 +52,9 @@ class TestItem:
 
         expected_columns = [
             {"name": "pop_est", "type": "double"},
-            {"name": "continent", "type": "byte_array"},
-            {"name": "name", "type": "byte_array"},
-            {"name": "iso_a3", "type": "byte_array"},
+            {"name": "continent", "type": "string"},
+            {"name": "name", "type": "string"},
+            {"name": "iso_a3", "type": "string"},
             {"name": "gdp_md_est", "type": "int64"},
             {"name": "geometry", "type": "byte_array"},
         ]
