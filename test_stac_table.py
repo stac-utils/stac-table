@@ -51,11 +51,11 @@ class TestItem:
         )
 
         expected_columns = [
-            {"name": "pop_est", "type": "int64"},
+            {"name": "pop_est", "type": "double"},
             {"name": "continent", "type": "byte_array"},
             {"name": "name", "type": "byte_array"},
             {"name": "iso_a3", "type": "byte_array"},
-            {"name": "gdp_md_est", "type": "double"},
+            {"name": "gdp_md_est", "type": "int64"},
             {"name": "geometry", "type": "byte_array"},
         ]
         assert result.properties["table:columns"] == expected_columns
