@@ -51,11 +51,11 @@ class TestItem:
         )
 
         expected_columns = [
-            {"name": "pop_est", "type": "int64"},
+            {"name": "pop_est", "type": "double"},
             {"name": "continent", "type": "byte_array"},
             {"name": "name", "type": "byte_array"},
             {"name": "iso_a3", "type": "byte_array"},
-            {"name": "gdp_md_est", "type": "double"},
+            {"name": "gdp_md_est", "type": "int64"},
             {"name": "geometry", "type": "byte_array"},
         ]
         assert result.properties["table:columns"] == expected_columns
@@ -145,6 +145,20 @@ class TestItem:
 
         assert result.properties["start_datetime"] == "2000-01-01T00:00:00Z"
         assert result.properties["end_datetime"] == "2000-01-03T00:00:00Z"
+
+    def test_infer_datetime_nogeom(self):
+        df = pd.DataFrame(
+            {"A": [pd.Timestamp("2000-01-01"), pd.Timestamp("2000-01-03")]},
+        )
+        df.to_parquet("data.parquet")
+        item = pystac.Item(
+            "naturalearth_lowres", None, None, datetime.datetime(2021, 1, 1), {}
+        )
+        result = stac_table.generate(
+            "data.parquet", item, datetime_column="A", infer_datetime="midpoint",
+            proj=False
+        )
+        assert result.properties["datetime"] == "2021-01-01T00:00:00Z"
 
     def test_metadata(self):
         df = geopandas.GeoDataFrame(

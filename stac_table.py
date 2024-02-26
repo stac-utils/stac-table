@@ -155,7 +155,10 @@ def generate(
         or infer_datetime != InferDatetimeOptions.no
         or proj is True
     ):
-        data = dask_geopandas.read_parquet(uri, storage_options=storage_options)
+        if proj:
+            data = dask_geopandas.read_parquet(uri, storage_options=storage_options)
+        else:
+            data = dask.dataframe.read_parquet(uri, storage_options=storage_options)
     #     # TODO: this doesn't actually work
     #     data = dask_geopandas.read_parquet(
     #         ds.files, storage_options={"filesystem": ds.filesystem}
